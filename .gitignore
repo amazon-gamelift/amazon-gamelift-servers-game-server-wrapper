@@ -1,0 +1,21 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+/pkg
+/out
+/src/.env.local
+*.log
+src/cmd/fakegame/fakegame
+sso-creds.ini
+/src/build/
+
+# JetBrains Rider
+.idea/
+*.iml
+
+# Mac
+.DS_Store
+
+# Amazon GameLift Servers Server SDK
+/src/ext/gamelift-servers-server-sdk/
+gamelift-servers-server-sdk.zip
