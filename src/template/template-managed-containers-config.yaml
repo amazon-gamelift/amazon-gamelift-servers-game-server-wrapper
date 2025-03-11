@@ -1,0 +1,15 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+log-config:
+  wrapper-log-level: debug
+
+ports:
+  gamePort: 37016
+
+game-server-details:
+  executable-file-path: ./MyGame/my-server-executable
+  game-server-args:
+    - arg: "--port"
+      val: "{{.GamePort}}"
+      pos: 0

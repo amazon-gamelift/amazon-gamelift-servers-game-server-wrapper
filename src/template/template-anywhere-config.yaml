@@ -1,0 +1,22 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+log-config:
+  wrapper-log-level: debug
+
+anywhere:
+  provider: aws-profile
+  profile: default
+  location-arn: arn:aws:gamelift:us-west-2:0123456789012:location/custom-your-location
+  fleet-arn: arn:aws:gamelift:us-west-2:0123456789012:fleet/fleet-00000000-0000-0000-0000-000000000000
+  ipv4: 127.0.0.1
+
+ports:
+  gamePort: 37016
+
+game-server-details:
+  executable-file-path: ./MyGame/my-server-executable
+  game-server-args:
+    - arg: "--port"
+      val: "{{.GamePort}}"
+      pos: 0
