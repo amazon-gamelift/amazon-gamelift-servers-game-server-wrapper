@@ -402,14 +402,9 @@ ports:
 
 game-server-details:
   executable-file-path: ./MyGame/my-server-executable           # Entry point to execute the game server
-  game-server-args:                                             # (Optional) Argument key value pairs that are passed to the game server entry point
-    - arg: "--port"
-      val: "{{.GamePort}}"
-      pos: 0
 ```
 
 - Provide the path of your game server executable in `executable-file-path`. Using the above config as an example the wrapper would expect the game server to be on disk at `./gameserver.sh`
-- `game-server-args` defines arguments that will be passed to the game server executable. See [Game Server Arguments](#game-server-arguments) for details.
 
 ### Build Image
 Build the image using `docker build` for the gamelift-servers-managed-containers directory. For example
