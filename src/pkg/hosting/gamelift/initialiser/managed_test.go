@@ -7,18 +7,19 @@ package initialiser
 
 import (
 	"bytes"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/mocks"
-	"golang.org/x/net/context"
 	"log/slog"
 	"time"
+
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/mocks"
+	"golang.org/x/net/context"
 )
 
 type ManagedMockHelper struct {
-	logger            *slog.Logger
-	logBuffer         *bytes.Buffer
-	gameLiftSdk       *mocks.GameLiftSdkMock
-	ctx               context.Context
-	managed           Service
+	logger      *slog.Logger
+	logBuffer   *bytes.Buffer
+	gameLiftSdk *mocks.GameLiftSdkMock
+	ctx         context.Context
+	managed     Service
 }
 
 func createManagedMockHelper() ManagedMockHelper {
@@ -30,12 +31,10 @@ func createManagedMockHelper() ManagedMockHelper {
 	gameLiftSdkMock := mocks.GameLiftSdkMock{}
 	managed := newManaged(&gameLiftSdkMock, logger)
 	return ManagedMockHelper{
-		logger:            logger,
-		logBuffer:         &logBuffer,
-		gameLiftSdk:       &gameLiftSdkMock,
-		ctx:               ctx,
-		managed:           managed,
+		logger:      logger,
+		logBuffer:   &logBuffer,
+		gameLiftSdk: &gameLiftSdkMock,
+		ctx:         ctx,
+		managed:     managed,
 	}
 }
-
-

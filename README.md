@@ -302,7 +302,7 @@ aws gamelift upload-build \
     --build-version gamelift-test-2025-03-11-1 \
     --build-root out/linux/amd64/gamelift-servers-managed-ec2 \
     --operating-system AMAZON_LINUX_2023 \
-    --server-sdk-version 5.2.1 \
+    --server-sdk-version 5.3.0 \
     --region us-west-2
 ```
 - For Windows builds, use `--operating-system WINDOWS_2016`
@@ -404,7 +404,7 @@ game-server-details:
   executable-file-path: ./MyGame/my-server-executable           # Entry point to execute the game server
   game-server-args:                                             # (Optional) Argument key value pairs that are passed to the game server entry point
     - arg: "--port"
-      val: "{{.GamePort}}"
+      val: "{{.ContainerPort}}"                                 # This is the container-internal port that your game server listens on. The value comes from the 'ports: gamePort' setting.
       pos: 0
 ```
 
@@ -446,7 +446,7 @@ aws gamelift create-container-group-definition \
 --operating-system AMAZON_LINUX_2023 \
 --total-memory-limit-mebibytes 1024 \
 --total-vcpu-limit 1 \
---game-server-container-definition "{\"ContainerName\": \"GameServer\", \"ImageUri\": \"${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/gamelift-sdk-wrapper-sample:latest\", \"PortConfiguration\": {\"ContainerPortRanges\": [{\"FromPort\": 37016, \"ToPort\": 37020, \"Protocol\": \"TCP\"}]}, \"ServerSdkVersion\": \"5.2.1\"}"
+--game-server-container-definition "{\"ContainerName\": \"GameServer\", \"ImageUri\": \"${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/gamelift-sdk-wrapper-sample:latest\", \"PortConfiguration\": {\"ContainerPortRanges\": [{\"FromPort\": 37016, \"ToPort\": 37020, \"Protocol\": \"TCP\"}]}, \"ServerSdkVersion\": \"5.3.0\"}"
 ```
 Wait for it to be READY before proceeding. You can check its status using [AWS console](https://console.aws.amazon.com/gamelift/container-groups) or [DescribeContainerGroupDefinition API](https://docs.aws.amazon.com/gamelift/latest/apireference/API_DescribeContainerGroupDefinition.html)
 ### Create Container Fleet Role

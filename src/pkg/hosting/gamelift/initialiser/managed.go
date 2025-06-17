@@ -6,11 +6,12 @@
 package initialiser
 
 import (
-	"aws/amazon-gamelift-go-sdk/server"
 	"context"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/sdk"
 	"log/slog"
 	"sync"
+
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/sdk"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/server"
 )
 
 type managed struct {

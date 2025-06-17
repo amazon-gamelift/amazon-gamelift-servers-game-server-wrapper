@@ -7,12 +7,13 @@ package config
 
 import (
 	"fmt"
-	"github.com/aws/aws-sdk-go-v2/aws/arn"
-	"github.com/go-playground/validator/v10"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/aws/aws-sdk-go-v2/aws/arn"
+	"github.com/go-playground/validator/v10"
 
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/config"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/observability"

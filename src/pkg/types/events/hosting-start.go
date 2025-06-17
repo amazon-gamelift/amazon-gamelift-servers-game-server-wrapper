@@ -12,6 +12,7 @@ import (
 // HostingStart represents the initialization configuration for a game server instance.
 type HostingStart struct {
 	CliArgs                   []config.CliArg
+	ContainerPort             int
 	DNSName                   string
 	FleetId                   string
 	GamePort                  int

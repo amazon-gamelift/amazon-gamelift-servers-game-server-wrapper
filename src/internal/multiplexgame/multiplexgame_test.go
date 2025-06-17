@@ -7,6 +7,12 @@ package multiplexgame
 
 import (
 	"bytes"
+	"log/slog"
+	"path/filepath"
+	"runtime"
+	"testing"
+	"time"
+
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/config"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/mocks"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/game"
@@ -17,11 +23,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
-	"log/slog"
-	"path/filepath"
-	"runtime"
-	"testing"
-	"time"
 )
 
 type MultiPlexGameMock struct {

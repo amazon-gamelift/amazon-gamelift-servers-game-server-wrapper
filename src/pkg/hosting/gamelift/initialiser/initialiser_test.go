@@ -7,15 +7,16 @@ package initialiser
 
 import (
 	"bytes"
+	"log/slog"
+	"testing"
+	"time"
+
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/mocks"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/config"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/client"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/sdk"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
-	"log/slog"
-	"testing"
-	"time"
 )
 
 type InitialiserMockHelper struct {
@@ -78,11 +79,11 @@ func Test_GetService_HappyPath_Anywhere(t *testing.T) {
 
 	anywhereConfig := config.Anywhere{
 		Config: config.AwsConfig{
-			Region:  "eu-west-1",
+			Region:   "eu-west-1",
 			Provider: "aws-profile",
-			Literal: config.AwsConfigLiteral{},
-			Profile: "gamelift",
-			SSOFile: "",
+			Literal:  config.AwsConfigLiteral{},
+			Profile:  "gamelift",
+			SSOFile:  "",
 		},
 		Host: config.AnywhereHostConfig{
 			HostName:    "gamelift",

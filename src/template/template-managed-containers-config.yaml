@@ -11,5 +11,5 @@ game-server-details:
   executable-file-path: ./MyGame/my-server-executable
   game-server-args:
     - arg: "--port"
-      val: "{{.GamePort}}"
+      val: "{{.ContainerPort}}"
       pos: 0

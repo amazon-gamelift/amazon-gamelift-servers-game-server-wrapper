@@ -6,10 +6,11 @@
 package initialiser
 
 import (
+	"log/slog"
+
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/config"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/sdk"
 	"golang.org/x/net/context"
-	"log/slog"
 )
 
 type InitialiserServiceMock struct {

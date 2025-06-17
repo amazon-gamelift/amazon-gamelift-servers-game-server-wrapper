@@ -9,12 +9,13 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
-	"github.com/pkg/errors"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
+	"github.com/pkg/errors"
 )
 
 type BufferedLogger struct {

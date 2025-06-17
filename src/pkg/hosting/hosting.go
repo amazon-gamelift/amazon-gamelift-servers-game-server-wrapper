@@ -7,9 +7,10 @@ package hosting
 
 import (
 	"context"
+	"net/netip"
+
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/types/events"
 	"github.com/google/uuid"
-	"net/netip"
 )
 
 // IpAddresses contains the network addressing information for a hosting option.

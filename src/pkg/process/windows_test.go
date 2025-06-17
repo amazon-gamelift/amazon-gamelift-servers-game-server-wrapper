@@ -6,9 +6,10 @@
 package process
 
 import (
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetByIdRedisCacheHit(t *testing.T) {

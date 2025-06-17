@@ -7,12 +7,13 @@ package observability
 
 import (
 	"fmt"
+	"log/slog"
+
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
 	"github.com/go-logr/logr"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.25.0"
-	"log/slog"
 )
 
 func SetLogger(handler slog.Handler) {
