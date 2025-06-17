@@ -7,12 +7,13 @@ package observability
 
 import (
 	"context"
+	"net/url"
+	"time"
+
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	"go.opentelemetry.io/otel/metric"
 	metricsdk "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
-	"net/url"
-	"time"
 )
 
 // MeterProvider defines the interface for managing metrics collection.

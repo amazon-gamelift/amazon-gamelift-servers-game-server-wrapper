@@ -6,9 +6,14 @@
 package gamelift
 
 import (
-	"aws/amazon-gamelift-go-sdk/model"
 	"bytes"
 	"errors"
+	"log/slog"
+	"os"
+	"runtime"
+	"testing"
+	"time"
+
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/mocks"
 	config2 "github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/config"
@@ -17,14 +22,10 @@ import (
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/initialiser"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/types/events"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/model"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
-	"log/slog"
-	"os"
-	"runtime"
-	"testing"
-	"time"
 )
 
 type GameLiftMockHelper struct {
@@ -265,4 +266,82 @@ func TestGamelift_Run_HappyPath_Call_StartGameSession(t *testing.T) {
 	logString := gameLiftMockHelper.logBuffer.String()
 	assert.Contains(t, logString, "start game sessions called")
 	assert.Contains(t, logString, "manager onHostingStart")
+}
+
+func TestGamelift_OnStartGameSession_ContainerPort(t *testing.T) {
+	tests := []struct {
+		description           string
+		fleetId               string
+		configPort            int
+		expectedContainerPort int
+	}{
+		{
+			description:           "Container fleet should use config port",
+			fleetId:               "containerfleet-123",
+			configPort:            8080,
+			expectedContainerPort: 8080,
+		},
+		{
+			description:           "Non-container fleet should not set container port",
+			fleetId:               "fleet-123",
+			configPort:            8080,
+			expectedContainerPort: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+
+			config := Config{
+				GamePort:     tt.configPort,
+				LogDirectory: os.TempDir(),
+			}
+
+			gameLiftMockHelper := createGameLiftMockHelper(&config)
+			var hostingStart *events.HostingStart
+			callback := false
+
+			gameLiftMockHelper.gamelift.onHostingStart = func(ctx context.Context, h *events.HostingStart, end <-chan error) error {
+				hostingStart = h
+				callback = true
+				return nil
+			}
+
+			err := gameLiftMockHelper.gamelift.Run(gameLiftMockHelper.ctx)
+			assert.Nil(t, err)
+
+			// Create and invoke game session
+			gameSession := model.GameSession{
+				GameSessionID:             "test-session",
+				GameSessionData:           "gameSessionData",
+				Name:                      "gameSessionName",
+				MatchmakerData:            "matchmakerData",
+				FleetID:                   tt.fleetId,
+				Location:                  "Location",
+				MaximumPlayerSessionCount: 0,
+				IPAddress:                 "192.168.1.1",
+				Port:                      0,
+				DNSName:                   "",
+				GameProperties: map[string]string{
+					"meta1": "alpha",
+					"meta2": "beta",
+				},
+				Status:       nil,
+				StatusReason: "",
+			}
+			gameLiftMockHelper.gameLiftSdk.ProcessParameters.OnStartGameSession(gameSession)
+
+			// Assert results
+			assert.True(t, callback)
+			assert.NotNil(t, hostingStart)
+			assert.Equal(t, tt.expectedContainerPort, hostingStart.ContainerPort)
+			assert.Equal(t, gameSession.Name, hostingStart.GameSessionName)
+			assert.Equal(t, gameSession.GameSessionData, hostingStart.GameSessionData)
+			assert.Equal(t, gameSession.MatchmakerData, hostingStart.MatchmakerData)
+			assert.Equal(t, tt.fleetId, hostingStart.FleetId)
+			assert.True(t, gameLiftMockHelper.gameLiftSdk.ActivateGameSessionCalled)
+			expectedGameProperties := `{"meta1":"alpha","meta2":"beta"}`
+			assert.Equal(t, expectedGameProperties, hostingStart.GameProperties)
+		})
+	}
 }

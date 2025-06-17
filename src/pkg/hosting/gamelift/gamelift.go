@@ -6,19 +6,20 @@
 package gamelift
 
 import (
-	"aws/amazon-gamelift-go-sdk/model"
-	"aws/amazon-gamelift-go-sdk/server"
 	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
 	"log/slog"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
+
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/model"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/server"
 
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/config"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting"
@@ -266,6 +267,10 @@ func (gameLift *gamelift) glOnStartGameSession(gs model.GameSession) {
 		MatchmakerData:            gs.MatchmakerData,
 		MaximumPlayerSessionCount: gs.MaximumPlayerSessionCount,
 		Provider:                  config.ProviderGameLift,
+	}
+
+	if strings.HasPrefix(hse.FleetId, "containerfleet-") {
+		hse.ContainerPort = gameLift.cfg.GamePort
 	}
 
 	if err := gameLift.sdk.ActivateGameSession(gameLift.ctx); err != nil {

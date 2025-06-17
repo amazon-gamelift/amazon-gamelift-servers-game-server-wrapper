@@ -60,11 +60,11 @@ const (
 
 // AwsConfig defines the configuration for AWS service access.
 type AwsConfig struct {
-	Region  string           `mapstructure:"region" yaml:"region,omitempty"`
+	Region   string            `mapstructure:"region" yaml:"region,omitempty"`
 	Provider AwsConfigProvider `mapstructure:"provider" yaml:"provider,omitempty"`
-	Literal AwsConfigLiteral `mapstructure:"literal" yaml:"literal,omitempty"`
-	Profile string           `mapstructure:"profile" yaml:"profile,omitempty"`
-	SSOFile string           `mapstructure:"ssoFile" yaml:"ssoFile,omitempty"`
+	Literal  AwsConfigLiteral  `mapstructure:"literal" yaml:"literal,omitempty"`
+	Profile  string            `mapstructure:"profile" yaml:"profile,omitempty"`
+	SSOFile  string            `mapstructure:"ssoFile" yaml:"ssoFile,omitempty"`
 }
 
 // AwsConfigLiteral contains direct AWS credentials.

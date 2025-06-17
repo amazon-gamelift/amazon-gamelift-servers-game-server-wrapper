@@ -6,9 +6,10 @@
 package observability
 
 import (
+	"log/slog"
+
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
-	"log/slog"
 )
 
 // Observability manages all observability abilities within an application.

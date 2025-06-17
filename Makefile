@@ -9,10 +9,10 @@ COMPUTE_TYPES ?= managed-ec2 anywhere managed-containers
 
 MAJOR ?= 1
 MINOR ?= 0
-PATCH ?= 0
+PATCH ?= 1
 APP_NAME ?= amazon-gamelift-servers-game-server-wrapper
 APP_PACKAGE ?= github.com/amazon-gamelift/$(APP_NAME)
-SERVER_SDK_URL=https://gamelift-server-sdk-release.s3.us-west-2.amazonaws.com/go/GameLift-Go-ServerSDK-5.2.1.zip
+SERVER_SDK_URL=https://github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/releases/download/v5.3.0/GameLift-Go-ServerSDK-5.3.0.zip
 SERVER_SDK_FILE_NAME=gamelift-servers-server-sdk.zip
 SERVER_SDK_EXTRACT_DIR=src/ext/gamelift-servers-server-sdk
 

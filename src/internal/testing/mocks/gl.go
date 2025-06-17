@@ -6,9 +6,10 @@
 package mocks
 
 import (
-	"aws/amazon-gamelift-go-sdk/server"
 	"runtime"
 	"strings"
+
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/server"
 )
 
 type GlMock struct {

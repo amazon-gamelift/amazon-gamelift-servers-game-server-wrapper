@@ -8,6 +8,7 @@ package observability
 import (
 	"context"
 	"encoding/hex"
+
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/attribute"

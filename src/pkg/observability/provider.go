@@ -7,12 +7,13 @@ package observability
 
 import (
 	"context"
+	"log/slog"
+	"time"
+
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/trace"
-	"log/slog"
-	"time"
 )
 
 // Provider manages the lifecycle and accessibility of the observability
@@ -114,7 +115,6 @@ func (provider *Provider) Stack(log, trace, metric string, nextLogger slog.Handl
 
 	return o
 }
-
 
 // NewProvider creates a new Provider instance with all observability
 // components configured based on the provided configuration.

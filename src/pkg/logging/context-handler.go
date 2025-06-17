@@ -7,8 +7,9 @@ package logging
 
 import (
 	"context"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
 	"log/slog"
+
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
 )
 
 type ContextHandler struct {
