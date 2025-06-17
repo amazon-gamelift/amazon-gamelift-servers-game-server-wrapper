@@ -7,15 +7,16 @@ package observability
 
 import (
 	"context"
+	"log/slog"
+	"net/url"
+	"strconv"
+	"time"
+
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp"
 	"go.opentelemetry.io/otel/log"
 	logsdk "go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/trace"
-	"log/slog"
-	"net/url"
-	"strconv"
-	"time"
 )
 
 // LoggerProvider defines the interface for managing log collection.

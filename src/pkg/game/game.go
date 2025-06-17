@@ -7,6 +7,7 @@ package game
 
 import (
 	"context"
+
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/types/events"
 	"github.com/google/uuid"
 )

@@ -9,6 +9,10 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"log/slog"
+	"testing"
+	"time"
+
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/mocks"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/config"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/client"
@@ -16,9 +20,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/gamelift/types"
 	"github.com/aws/smithy-go/middleware"
 	"github.com/stretchr/testify/assert"
-	"log/slog"
-	"testing"
-	"time"
 )
 
 type AnywhereMockHelper struct {

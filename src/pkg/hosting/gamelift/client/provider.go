@@ -8,13 +8,14 @@ package client
 import (
 	"context"
 	"fmt"
+	"log/slog"
+
 	pkgConfig "github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/config"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awscfg "github.com/aws/aws-sdk-go-v2/config"
 	gl "github.com/aws/aws-sdk-go-v2/service/gamelift"
 	"github.com/aws/smithy-go/logging"
 	"github.com/pkg/errors"
-	"log/slog"
 )
 
 var _ Provider = (*provider)(nil)
@@ -80,25 +81,25 @@ func (provider *provider) GetGameLift(ctx context.Context) (GameLift, error) {
 }
 
 func NewProvider(cfg pkgConfig.Anywhere, logger *slog.Logger) (Provider, error) {
-    var configProvider ConfigProvider
+	var configProvider ConfigProvider
 	if len(cfg.Config.Region) == 0 {
 		return nil, errors.New("no region specified")
 	}
 
-    switch cfg.Config.Provider {
-    case pkgConfig.AwsConfigProviderProfile:
-        configProvider = NewProfileProvider(cfg.Config.Profile)
-    case pkgConfig.AwsConfigProviderSSOFile:
-        if len(cfg.Config.SSOFile) == 0 {
-            return nil, fmt.Errorf("no sso env file path provided")
-        }
-        configProvider = NewSSOFileProvider(cfg.Config.SSOFile, logger)
-    default:
-        return nil, fmt.Errorf("unknown provider: %s", cfg.Config.Provider)
-    }
+	switch cfg.Config.Provider {
+	case pkgConfig.AwsConfigProviderProfile:
+		configProvider = NewProfileProvider(cfg.Config.Profile)
+	case pkgConfig.AwsConfigProviderSSOFile:
+		if len(cfg.Config.SSOFile) == 0 {
+			return nil, fmt.Errorf("no sso env file path provided")
+		}
+		configProvider = NewSSOFileProvider(cfg.Config.SSOFile, logger)
+	default:
+		return nil, fmt.Errorf("unknown provider: %s", cfg.Config.Provider)
+	}
 
 	p := &provider{
-	    optProvider: configProvider,
+		optProvider: configProvider,
 		cfg:         cfg,
 		logger:      logger,
 	}

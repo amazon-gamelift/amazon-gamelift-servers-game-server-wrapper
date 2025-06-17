@@ -6,10 +6,11 @@
 package manager
 
 import (
+	"time"
+
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/game"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/types/events"
 	"golang.org/x/net/context"
-	"time"
 )
 
 type GameServiceMock struct {

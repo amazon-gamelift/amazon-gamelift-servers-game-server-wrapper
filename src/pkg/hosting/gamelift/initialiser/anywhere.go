@@ -6,19 +6,20 @@
 package initialiser
 
 import (
-	"aws/amazon-gamelift-go-sdk/common"
-	"aws/amazon-gamelift-go-sdk/server"
 	"context"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/config"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/client"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/sdk"
-	"github.com/aws/aws-sdk-go-v2/service/gamelift"
-	"github.com/google/uuid"
-	"github.com/pkg/errors"
 	"log/slog"
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/config"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/client"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/sdk"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/common"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/server"
+	"github.com/aws/aws-sdk-go-v2/service/gamelift"
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
 )
 
 type anywhere struct {

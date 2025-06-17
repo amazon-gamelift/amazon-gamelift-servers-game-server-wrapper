@@ -7,9 +7,10 @@ package services
 
 import (
 	"context"
+	"log/slog"
+
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/initialiser"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/sdk"
-	"log/slog"
 
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/config"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting"

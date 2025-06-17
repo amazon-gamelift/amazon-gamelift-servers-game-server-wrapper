@@ -6,11 +6,12 @@
 package sdk
 
 import (
-	"aws/amazon-gamelift-go-sdk/server/log"
 	"context"
 	"fmt"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
 	"log/slog"
+
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/server/log"
 )
 
 type logAdaptor struct {

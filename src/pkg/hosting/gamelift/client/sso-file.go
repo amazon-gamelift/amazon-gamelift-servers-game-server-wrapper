@@ -7,6 +7,11 @@ package client
 
 import (
 	"context"
+	"log/slog"
+	"reflect"
+	"strings"
+	"sync"
+
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
 	awscfg "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
@@ -14,10 +19,6 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
-	"log/slog"
-	"reflect"
-	"strings"
-	"sync"
 )
 
 var _ ConfigProvider = (*SSOFileProvider)(nil)

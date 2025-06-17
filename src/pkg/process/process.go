@@ -8,13 +8,14 @@ package process
 import (
 	"context"
 	"fmt"
-	"github.com/pkg/errors"
 	"io"
 	"log/slog"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"syscall"
+
+	"github.com/pkg/errors"
 )
 
 // Result represents the outcome of a process execution.

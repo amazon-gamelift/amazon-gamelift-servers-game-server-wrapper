@@ -8,8 +8,9 @@ package services
 import (
 	"context"
 	"fmt"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/runner"
 	"log/slog"
+
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/runner"
 
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/config"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/logging"

@@ -7,6 +7,10 @@ package app
 
 import (
 	"errors"
+	"log/slog"
+	"testing"
+	"time"
+
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/mocks"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
@@ -14,9 +18,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
-	"log/slog"
-	"testing"
-	"time"
 )
 
 type AppMock struct {

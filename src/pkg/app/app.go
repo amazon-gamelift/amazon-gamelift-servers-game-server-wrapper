@@ -7,20 +7,21 @@ package app
 
 import (
 	"context"
+	"log/slog"
+	"runtime/debug"
+	"time"
+
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/runner"
 	"github.com/pkg/errors"
-	"log/slog"
-	"runtime/debug"
-	"time"
 )
 
 // Service represents the application service that manages the game server lifecycle
 type Service struct {
-	logger  *slog.Logger			// Handles logging operations
-	runner  *runner.Runner			// Manages game server execution
-	spanner observability.Spanner	// Provides tracing and monitoring
+	logger  *slog.Logger          // Handles logging operations
+	runner  *runner.Runner        // Manages game server execution
+	spanner observability.Spanner // Provides tracing and monitoring
 }
 
 // Run executes the application logic with panic recovery and observability.

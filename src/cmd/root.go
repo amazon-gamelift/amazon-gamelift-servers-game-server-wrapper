@@ -8,12 +8,13 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"runtime/debug"
 	"strings"
+
+	"github.com/google/uuid"
 
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/config"

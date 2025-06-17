@@ -6,11 +6,12 @@
 package cmd
 
 import (
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
-	"github.com/spf13/cobra"
 	"log/slog"
 	"os"
 	"path/filepath"
+
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
+	"github.com/spf13/cobra"
 )
 
 // appInit initializes the application's core components including logging

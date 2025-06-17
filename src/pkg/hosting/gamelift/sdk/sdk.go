@@ -6,9 +6,10 @@
 package sdk
 
 import (
-	"aws/amazon-gamelift-go-sdk/server"
 	"context"
 	"log/slog"
+
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/server"
 )
 
 // GameLiftSdk defines the interface for interacting with server SDK for Amazon GameLift Servers.

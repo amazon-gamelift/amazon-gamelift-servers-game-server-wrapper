@@ -4,7 +4,7 @@
 param (
     [string]$Major = "1",
     [string]$Minor = "0",
-    [string]$Patch = "0",
+    [string]$Patch = "1",
     [string]$Out = "out"
 )
 
@@ -16,7 +16,7 @@ $GoArch = "amd64"
 $FileExt = ".exe"
 $OutFolder = "$Out\$GoOS\$GoArch\"
 $BuildDir = "src"
-$ServerSdkUrl = "https://gamelift-server-sdk-release.s3.us-west-2.amazonaws.com/go/GameLift-Go-ServerSDK-5.2.1.zip"
+$ServerSdkUrl = "https://github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/releases/download/v5.3.0/GameLift-Go-ServerSDK-5.3.0.zip"
 $ServerSdkFileName = "gamelift-server-sdk.zip"
 $ServerSdkExtractDir = "src/ext/gamelift-servers-server-sdk"
 

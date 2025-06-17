@@ -8,6 +8,10 @@ package manager
 import (
 	"bytes"
 	"errors"
+	"log/slog"
+	"testing"
+	"time"
+
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/mocks"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/game"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting"
@@ -16,9 +20,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
-	"log/slog"
-	"testing"
-	"time"
 )
 
 type ManagerTestHelper struct {

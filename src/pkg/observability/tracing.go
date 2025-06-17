@@ -7,12 +7,13 @@ package observability
 
 import (
 	"context"
+	"net/url"
+	"time"
+
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
-	"net/url"
-	"time"
 )
 
 // TracerProvider defines the interface for managing trace collection
@@ -23,7 +24,6 @@ type TracerProvider interface {
 	Shutdown(ctx context.Context) error
 	Tracer(name string, options ...trace.TracerOption) trace.Tracer
 }
-
 
 // NewTracingProvider creates a new TracerProvider configured with the provided
 // resource and configuration options.

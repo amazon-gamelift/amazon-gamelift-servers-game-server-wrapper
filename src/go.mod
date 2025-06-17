@@ -2,10 +2,10 @@ module github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper
 
 go 1.22.1
 
-replace aws/amazon-gamelift-go-sdk => ./ext/gamelift-servers-server-sdk
+replace github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk => ./ext/gamelift-servers-server-sdk
 
 require (
-	aws/amazon-gamelift-go-sdk v0.0.0-00010101000000-000000000000
+	github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk v0.0.0-20250527005813-7edcfc53c706
 	github.com/aws/aws-sdk-go-v2 v1.26.1
 	github.com/aws/aws-sdk-go-v2/config v1.27.9
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.9

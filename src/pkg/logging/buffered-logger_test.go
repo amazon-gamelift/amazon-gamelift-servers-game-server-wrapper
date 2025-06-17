@@ -9,12 +9,13 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"log/slog"
 	"os"
 	"os/exec"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type msg struct {
