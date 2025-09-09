@@ -1,8 +1,6 @@
-module github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper
+module github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper
 
 go 1.22.1
-
-replace github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk => ./ext/gamelift-servers-server-sdk
 
 require (
 	github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk v0.0.0-20250527005813-7edcfc53c706

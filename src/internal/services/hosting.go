@@ -9,13 +9,13 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/initialiser"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/sdk"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/initialiser"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/sdk"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/config"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/internal/config"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/hosting"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
 )
 
 func getHosting(ctx context.Context, cfg *config.Config, logger *slog.Logger, spanner observability.Spanner) (hosting.Service, error) {

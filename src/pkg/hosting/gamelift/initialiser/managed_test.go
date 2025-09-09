@@ -10,7 +10,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/mocks"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/internal/mocks"
 	"golang.org/x/net/context"
 )
 

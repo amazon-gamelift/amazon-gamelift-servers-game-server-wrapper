@@ -9,7 +9,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
 	"github.com/pkg/errors"
 )
 

@@ -10,9 +10,9 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/game"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/types/events"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/game"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/types/events"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )

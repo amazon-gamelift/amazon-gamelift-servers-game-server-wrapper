@@ -6,7 +6,7 @@
 package events
 
 import (
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/config"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/config"
 )
 
 // HostingStart represents the initialization configuration for a game server instance.

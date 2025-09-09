@@ -6,7 +6,7 @@
 package mocks
 
 import (
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/process"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/process"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/server"
 	"github.com/google/uuid"
 	"go.opentelemetry.io/otel/trace"

@@ -11,9 +11,9 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/runner"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/internal"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/runner"
 	"github.com/pkg/errors"
 )
 

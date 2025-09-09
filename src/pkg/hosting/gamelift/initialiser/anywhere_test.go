@@ -13,9 +13,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/mocks"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/config"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/client"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/internal/mocks"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/config"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/client"
 	"github.com/aws/aws-sdk-go-v2/service/gamelift"
 	"github.com/aws/aws-sdk-go-v2/service/gamelift/types"
 	"github.com/aws/smithy-go/middleware"

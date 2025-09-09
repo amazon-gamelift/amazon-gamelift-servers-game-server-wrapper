@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	pkgConfig "github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/config"
+	pkgConfig "github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/config"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awscfg "github.com/aws/aws-sdk-go-v2/config"
 	gl "github.com/aws/aws-sdk-go-v2/service/gamelift"

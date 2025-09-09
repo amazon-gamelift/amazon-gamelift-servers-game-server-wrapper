@@ -8,10 +8,10 @@ package args
 import (
 	"testing"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/config"
-	pkgConf "github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/config"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/game"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/types/events"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/internal/config"
+	pkgConf "github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/config"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/game"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/types/events"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )

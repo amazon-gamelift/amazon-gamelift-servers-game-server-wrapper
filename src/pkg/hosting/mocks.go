@@ -8,7 +8,7 @@ package hosting
 import (
 	"time"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/types/events"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/types/events"
 	"golang.org/x/net/context"
 )
 

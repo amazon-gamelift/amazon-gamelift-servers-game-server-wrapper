@@ -10,12 +10,12 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/runner"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/runner"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/config"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/logging"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/manager"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/internal/config"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/logging"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/manager"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
 	"github.com/pkg/errors"
 )
 

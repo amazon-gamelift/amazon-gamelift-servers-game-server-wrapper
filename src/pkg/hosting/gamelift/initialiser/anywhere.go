@@ -12,9 +12,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/config"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/client"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/sdk"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/config"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/client"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/sdk"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/common"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/server"
 	"github.com/aws/aws-sdk-go-v2/service/gamelift"

@@ -8,7 +8,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/internal"
 	"github.com/spf13/cobra"
 )
 

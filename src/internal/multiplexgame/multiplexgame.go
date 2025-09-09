@@ -13,13 +13,13 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/config"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/multiplexgame/args"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/game"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/logging"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/process"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/types/events"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/internal/config"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/internal/multiplexgame/args"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/game"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/logging"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/process"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/types/events"
 )
 
 // New creates a new MultiplexGame instance with the provided configuration and dependencies.

@@ -11,11 +11,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/config"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/multiplexgame"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/game"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/logging"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/internal/config"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/internal/multiplexgame"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/game"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/logging"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
 	"github.com/pkg/errors"
 )
 

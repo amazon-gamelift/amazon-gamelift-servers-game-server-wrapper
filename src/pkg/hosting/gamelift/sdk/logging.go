@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/server/log"
 )
 

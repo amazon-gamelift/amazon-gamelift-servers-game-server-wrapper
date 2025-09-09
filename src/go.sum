@@ -1,3 +1,5 @@
+github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk v0.0.0-20250527005813-7edcfc53c706 h1:sT5ZQnjrDiImgXxnFJwh46jrMOSw9ga98tpw74lSkko=
+github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk v0.0.0-20250527005813-7edcfc53c706/go.mod h1:/TqMzq0IfkhuhA5L+kaoLOmYBT11pii6H3ngUsAJ+94=
 github.com/aws/aws-sdk-go-v2 v1.26.1 h1:5554eUqIYVWpU0YmeeYZ0wU64H2VLBs8TlhRB2L+EkA=
 github.com/aws/aws-sdk-go-v2 v1.26.1/go.mod h1:ffIFB97e2yNsv4aTSGkqtHnppsIJzw7G7BReUZ3jCXM=
 github.com/aws/aws-sdk-go-v2/config v1.27.9 h1:gRx/NwpNEFSk+yQlgmk1bmxxvQ5TyJ76CWXs9XScTqg=

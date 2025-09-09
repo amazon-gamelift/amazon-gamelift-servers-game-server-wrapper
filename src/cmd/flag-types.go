@@ -8,7 +8,7 @@ package cmd
 import (
 	"time"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/config"
+	"github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/pkg/config"
 )
 
 type hostingProvider config.Provider

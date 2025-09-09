@@ -5,7 +5,7 @@
 
 package main
 
-import "github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/cmd"
+import "github.com/Engine-Room-VR/amazon-gamelift-servers-game-server-wrapper/cmd"
 
 func main() {
 	cmd.Execute()
