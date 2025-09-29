@@ -8,7 +8,6 @@ package gamelift
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
@@ -247,18 +246,12 @@ func (gameLift *gamelift) glOnStartGameSession(gs model.GameSession) {
 	gameLift.logger.DebugContext(gameLift.ctx, "manager onHostingStart", "event", gs)
 	cliArgs := make([]config.CliArg, 0)
 
-	gamePropertiesBytes, err := json.Marshal(gs.GameProperties)
-	if err != nil {
-		gameLift.ec <- fmt.Errorf("failed to parse game properties: %w", err)
-	}
-	gameProperties := string(gamePropertiesBytes)
-
 	hse := &events.HostingStart{
 		DNSName:                   gs.DNSName,
 		CliArgs:                   cliArgs,
 		FleetId:                   gs.FleetID,
 		GamePort:                  gs.Port,
-		GameProperties:            gameProperties,
+		GameProperties:            gs.GameProperties,
 		GameSessionData:           gs.GameSessionData,
 		GameSessionId:             gs.GameSessionID,
 		GameSessionName:           gs.Name,

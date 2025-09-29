@@ -16,7 +16,7 @@ type HostingStart struct {
 	DNSName                   string
 	FleetId                   string
 	GamePort                  int
-	GameProperties            string
+	GameProperties            map[string]string
 	GameSessionData           string
 	GameSessionId             string
 	GameSessionName           string

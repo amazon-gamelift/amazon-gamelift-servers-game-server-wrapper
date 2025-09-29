@@ -1,0 +1,31 @@
+﻿# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+log-config:
+  wrapper-log-level: debug
+
+anywhere:
+  provider: aws-profile
+  profile: codewizards_sso
+  location-arn: arn:aws:gamelift:eu-west-2:645463837486:location/custom-keith-digby
+  fleet-arn: arn:aws:gamelift:eu-west-2:645463837486:fleet/fleet-8a09ff6d-06e3-44ce-b7b3-d53ddcdfb8cc
+  ipv4: 127.0.0.1
+
+ports:
+  gamePort: 37016
+
+game-server-details:
+  executable-file-path: /local/game/builds/engineroom/TestGameServer
+  game-server-args:
+    - arg: "--matchId"
+      val: "{{index .GameProperties \"MatchId\"}}"
+      pos: 0
+    - arg: "--startDate"
+      val: "\"{{index .GameProperties \"StartDate\"}}\""
+      pos: 1
+    - arg: "--timeout"
+      val: "\"{{index .GameProperties \"Timeout\"}}\""
+      pos: 2
+    - arg: "--playerIds"
+      val: "{{index .GameProperties \"PlayerIds\"}}"
+      pos: 3
