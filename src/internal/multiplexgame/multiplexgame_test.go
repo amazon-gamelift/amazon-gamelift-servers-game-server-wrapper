@@ -110,6 +110,10 @@ func TestRunHappyPath(t *testing.T) {
 		exePath = "./testrun.bat"
 	}
 
+	testEnvKey := "testEnvKey"
+	testEnvValue := "testEnvValue"
+	t.Setenv(testEnvKey, testEnvValue)
+
 	cfg := config.Config{
 		Ports: config.Ports{
 			GamePort: 12345,
@@ -142,6 +146,8 @@ func TestRunHappyPath(t *testing.T) {
 	assert.Contains(t, logString, "Waiting on process result")
 	assert.Contains(t, logString, "Process run finished")
 	assert.Contains(t, logString, "Process result received")
+	assert.Contains(t, logString, testEnvKey)
+	assert.Contains(t, logString, testEnvValue)
 }
 
 func TestInitHappyPath(t *testing.T) {
