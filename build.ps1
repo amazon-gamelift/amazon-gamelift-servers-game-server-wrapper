@@ -16,7 +16,7 @@ $GoArch = "amd64"
 $FileExt = ".exe"
 $OutFolder = "$Out\$GoOS\$GoArch\"
 $BuildDir = "src"
-$ServerSdkUrl = "https://github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/releases/download/v5.3.0/GameLift-Go-ServerSDK-5.3.0.zip"
+$ServerSdkUrl = "https://github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/releases/download/v5.4.0/GameLift-Go-ServerSDK-5.4.0.zip"
 $ServerSdkFileName = "gamelift-server-sdk.zip"
 $ServerSdkExtractDir = "src/ext/gamelift-servers-server-sdk"
 
