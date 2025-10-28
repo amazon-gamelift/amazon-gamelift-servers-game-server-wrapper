@@ -12,6 +12,7 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/config"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/multiplexgame/args"
@@ -219,8 +220,17 @@ func (multiplexGame *MultiplexGame) initProcess(ctx context.Context, build confi
 
 	multiplexGame.logger.DebugContext(ctx, "Working directory validated successfully", "dir", build.WorkingDir)
 
+	envMap := make(map[string]string)
+	for _, env := range os.Environ() {
+		pair := strings.SplitN(env, "=", 2)
+		if len(pair) == 2 {
+			envMap[pair[0]] = pair[1]
+		}
+	}
+	multiplexGame.logger.DebugContext(ctx, "Passing wrapper's environment variables to game process", "envVarsCount", len(envMap))
+
 	procCfg := &process.Config{
-		EnvVars:          make(map[string]string),
+		EnvVars:          envMap,
 		WorkingDirectory: build.WorkingDir,
 		ExeName:          build.RelativeExePath,
 	}
