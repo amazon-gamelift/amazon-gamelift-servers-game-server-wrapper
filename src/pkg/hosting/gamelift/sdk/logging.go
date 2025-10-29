@@ -11,7 +11,7 @@ import (
 	"log/slog"
 
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/server/log"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5/server/log"
 )
 
 type logAdaptor struct {

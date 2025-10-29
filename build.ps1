@@ -3,8 +3,8 @@
 
 param (
     [string]$Major = "1",
-    [string]$Minor = "0",
-    [string]$Patch = "1",
+    [string]$Minor = "1",
+    [string]$Patch = "0",
     [string]$Out = "out"
 )
 

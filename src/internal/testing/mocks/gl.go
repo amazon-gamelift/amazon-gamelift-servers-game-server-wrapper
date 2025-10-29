@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/server"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5/server"
 )
 
 type GlMock struct {

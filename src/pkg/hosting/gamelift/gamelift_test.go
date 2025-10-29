@@ -22,7 +22,7 @@ import (
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/initialiser"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/types/events"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/model"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5/model"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"

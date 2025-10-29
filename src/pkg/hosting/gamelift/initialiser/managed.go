@@ -11,7 +11,7 @@ import (
 	"sync"
 
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/sdk"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/server"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5/server"
 )
 
 type managed struct {
