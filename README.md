@@ -9,6 +9,7 @@
   - [Managed Container Fleet](#managed-container-fleet)
 - [Usage](#usage)
   - [Create Game Session](#create-game-session)
+- [Metrics](#metrics)
 - [Appendix](#appendix)
   - [Game Server Arguments](#game-server-arguments)
   - [Server SDK integration comparison against game server wrapper](#server-sdk-integration-comparison-against-game-server-wrapper)
@@ -16,6 +17,7 @@
 # Amazon GameLift Servers Game Server Wrapper
 
 This game server wrapper is designed for quick onboarding to [Amazon GameLift Servers](https://aws.amazon.com/gamelift/servers/) for any game server, ideal for rapid prototyping, fast iteration, and early testing. It allows you to run game server builds on Amazon GameLift Servers fleets without directly integrating your game server code with the server SDK for Amazon GameLift Servers. The wrapper supports the following types of Amazon GameLift Servers fleet deployments: Anywhere fleets, managed EC2 fleets, and managed container fleets.
+Telemetry metrics collection is included for visibility into game server performance.
 
 # Comparisons between Game Sever Wrapper and Full SDK Integration
 The game server wrapper enables rapid onboarding to Amazon GameLift Servers, supports all three types of fleets and [game session queue feature](https://docs.aws.amazon.com/gamelift/latest/developerguide/queues-intro.html). However, it does not support all server SDK functionalities that you would get with full integration with the server SDK for Amazon GameLift Servers, for example defining customized server SDK callback functions and player session management. See details [here](https://console.aws.amazon.com/gamelift/hosting), and see [here](#server-sdk-apis-support-comparison-against-full-server-sdk-integration) for a comparison of Sever SDK API support between the two.
@@ -511,6 +513,14 @@ Note:
 
 - You can use [TerminateGameSession API](https://docs.aws.amazon.com/gamelift/latest/apireference/API_TerminateGameSession.html) to terminate a game session.
 
+# Metrics
+
+The Game Server Wrapper supports collecting and publishing telemetry metrics from the managed Amazon GameLift Servers host to
+AWS services for monitoring and observability. For detailed setup and usage instructions, see [METRICS.md](./metrics/METRICS.md).
+
+![Telemetry Metrics on Amazon Grafana Dashboard](./metrics/telemetry_metrics.png)
+
+
 # Appendix
 ## Game Server Arguments
 When starting the game server the wrapper is able to provide arguments from configuration and game properties.
@@ -546,12 +556,6 @@ Example of configuration of arguments:
           val: "{{.GameSessionId}}"
           pos: 2
 ```
-
-## Metrics
-The Game Server Wrapper support collecting and publishing telemetry metrics from the managed Amazon GameLift Servers host to
-AWS services for monitoring and observability. For detailed setup and usage instructions, see [METRICS.md](./metrics/METRICS.md).
-
-
 
 ## Server SDK integration comparison against game server wrapper
 The game server wrapper automatically calls some methods from the server SDK for Amazon GameLift servers. To take full advantage of all of the methods, game servers must integrate with the server SDK instead of the game server wrapper.
