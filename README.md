@@ -557,6 +557,12 @@ Example of configuration of arguments:
           pos: 2
 ```
 
+## Metrics
+The Game Server Wrapper support collecting and publishing telemetry metrics from the managed Amazon GameLift Servers host to
+AWS services for monitoring and observability. For detailed setup and usage instructions, see [METRICS.md](./metrics/METRICS.md).
+
+
+
 ## Server SDK integration comparison against game server wrapper
 The game server wrapper automatically calls some methods from the server SDK for Amazon GameLift servers. To take full advantage of all of the methods, game servers must integrate with the server SDK instead of the game server wrapper.
 
