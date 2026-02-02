@@ -38,9 +38,10 @@ type GameLiftMockHelper struct {
 	config                        *Config
 	initialiserService            *initialiser.InitialiserServiceMock
 	initialiserServiceFactoryMock *initialiser.InitialiserServiceFactoryMock
+	messageSender                 *hosting.CustomMessageSenderMock
 }
 
-func createGameLiftMockHelper(config *Config) GameLiftMockHelper {
+func createGameLiftMockHelper(config *Config) *GameLiftMockHelper {
 	logBuffer := bytes.Buffer{}
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)
 	ctx = context.WithValue(ctx, constants.ContextKeyRunLogDir, config.LogDirectory)
@@ -56,8 +57,9 @@ func createGameLiftMockHelper(config *Config) GameLiftMockHelper {
 		GetServiceResponse: &initialiserServiceMock,
 		GetServiceError:    nil,
 	}
-	gamelift, _ := New(ctx, config, logger, &spannerMock, &initialiserServiceFactoryMock, &gameLiftSdkMock)
-	return GameLiftMockHelper{
+	messageSender := &hosting.CustomMessageSenderMock{}
+	gamelift, _ := New(ctx, config, logger, &spannerMock, &initialiserServiceFactoryMock, &gameLiftSdkMock, messageSender)
+	return &GameLiftMockHelper{
 		logger:                        logger,
 		logBuffer:                     &logBuffer,
 		spanner:                       &spannerMock,
@@ -67,6 +69,7 @@ func createGameLiftMockHelper(config *Config) GameLiftMockHelper {
 		config:                        config,
 		initialiserService:            &initialiserServiceMock,
 		initialiserServiceFactoryMock: &initialiserServiceFactoryMock,
+		messageSender:                 messageSender,
 	}
 }
 
@@ -171,6 +174,7 @@ func TestGamelift_Run_HappyPath_Call_HealthCheck(t *testing.T) {
 
 	//assert
 	assert.True(t, callback)
+	assert.Equal(t, 1, gameLiftMockHelper.messageSender.OnHealthCheckCount)
 }
 
 func TestGamelift_Run_HappyPath_Call_ProcessTerminate(t *testing.T) {
@@ -201,6 +205,7 @@ func TestGamelift_Run_HappyPath_Call_ProcessTerminate(t *testing.T) {
 	//assert
 	assert.True(t, callback)
 	assert.Equal(t, events.HostingTerminateReasonHostingShutdown, hostingTerminate.Reason)
+	assert.Equal(t, 1, gameLiftMockHelper.messageSender.OnHostingTerminateCount)
 }
 
 func TestGamelift_Run_HappyPath_Call_StartGameSession(t *testing.T) {
@@ -266,6 +271,7 @@ func TestGamelift_Run_HappyPath_Call_StartGameSession(t *testing.T) {
 	logString := gameLiftMockHelper.logBuffer.String()
 	assert.Contains(t, logString, "start game sessions called")
 	assert.Contains(t, logString, "manager onHostingStart")
+	assert.Equal(t, 1, gameLiftMockHelper.messageSender.OnStartGameSessionCount)
 }
 
 func TestGamelift_OnStartGameSession_ContainerPort(t *testing.T) {

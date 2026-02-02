@@ -29,8 +29,11 @@ type ProcessInfo struct {
 type GameLift struct {
 	Anywhere Anywhere `mapstructure:"anywhere" yaml:"anywhere"`
 	/// To be filled in by another source, not config
-	Port      int `mapstructure:"-" yaml:"-"`
-	QueryPort int `mapstructure:"-" yaml:"-"`
+	Port                       int    `mapstructure:"-" yaml:"-"`
+	QueryPort                  int    `mapstructure:"-" yaml:"-"`
+	InjectFleetRoleCredentials bool   `mapstructure:"injectFleetRoleCredentials" yaml:"injectFleetRoleCredentials"`
+	FleetRoleArn               string `mapstructure:"fleetRoleArn" yaml:"fleetRoleArn"`
+	FleetRoleSessionName       string `mapstructure:"fleetRoleSessionName" yaml:"fleetRoleSessionName,omitempty"`
 }
 
 // AnywhereHostConfig defines the configuration for an Amazon GameLift Anywhere host.
@@ -75,7 +78,12 @@ type AwsConfigLiteral struct {
 
 // CliArg represents a command-line argument configuration for the game server.
 type CliArg struct {
-	Name     string `json:"arg" yaml:"arg" mapstructure:"arg" yaml:"arg"`
-	Value    string `json:"val" yaml:"val" mapstructure:"val" yaml:"val"`
-	Position int    `json:"pos" yaml:"pos" mapstructure:"pos" yaml:"pos"`
+	Name     string `json:"arg" yaml:"arg" mapstructure:"arg"`
+	Value    string `json:"val" yaml:"val" mapstructure:"val"`
+	Position int    `json:"pos" yaml:"pos" mapstructure:"pos"`
+}
+
+type EnvVar struct {
+	Name  string `json:"name" yaml:"name" mapstructure:"name"`
+	Value string `json:"value" yaml:"value" mapstructure:"value"`
 }

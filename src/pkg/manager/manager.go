@@ -9,6 +9,7 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/datadog"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/game"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
@@ -35,11 +36,22 @@ type service struct {
 	spanner  observability.Spanner
 	gameMeta *game.InitMeta
 	initMeta *hosting.InitMeta
+	datadog  *datadog.Service
 }
 
 func (service *service) onHostingStart(ctx context.Context, h *events.HostingStart, end <-chan error) error {
 	ctx, span, _ := service.spanner.NewSpan(ctx, "manager onHostingStart", nil)
 	defer span.End()
+
+	// Update datadog configuration with templated tags if datadog service is available
+	if service.datadog != nil {
+		service.logger.DebugContext(ctx, "Updating datadog configuration with templated tags", "event", h)
+		if err := service.datadog.UpdateTags(ctx, h); err != nil {
+			service.logger.WarnContext(ctx, "Failed to update datadog configuration", "error", err)
+			// Don't fail the hosting start if datadog update fails
+		}
+	}
+
 	if err := service.harness.HostingStart(ctx, h, end); err != nil {
 		return errors.Wrapf(err, "Failed to start hosting")
 	}
@@ -158,7 +170,7 @@ func (service *service) Close(ctx context.Context) error {
 	return err
 }
 
-func New(cfg *Config, g game.Server, hosting hosting.Service, logger *slog.Logger, spanner observability.Spanner, harness Harness) *service {
+func New(cfg *Config, g game.Server, hosting hosting.Service, logger *slog.Logger, spanner observability.Spanner, harness Harness, datadog *datadog.Service) *service {
 
 	service := &service{
 		harness: harness,
@@ -166,6 +178,7 @@ func New(cfg *Config, g game.Server, hosting hosting.Service, logger *slog.Logge
 		logger:  logger,
 		spanner: spanner,
 		cfg:     cfg,
+		datadog: datadog,
 	}
 
 	return service

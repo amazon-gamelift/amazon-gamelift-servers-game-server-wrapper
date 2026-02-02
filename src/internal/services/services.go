@@ -7,12 +7,12 @@ package services
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/runner"
 
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/config"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/datadog"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/logging"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/manager"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
@@ -24,6 +24,7 @@ type Services struct {
 	Logger  *slog.Logger
 	Runner  *runner.Runner
 	Spanner observability.Spanner
+	Datadog *datadog.Service
 }
 
 // Default initializes a new Services instance with all required components.
@@ -45,20 +46,26 @@ func Default(ctx context.Context, cfg *config.Config, logger *slog.Logger, obs *
 		return nil, errors.Wrapf(err, "Service initialization failed: failed to get game")
 	}
 
+	// Initialize datadog service if enabled
+	var datadogService *datadog.Service
+	if cfg.Datadog.Enabled {
+		logger.DebugContext(ctx, "Initializing datadog service")
+		datadogService = datadog.New(cfg.Datadog.ConfigPath, cfg.Datadog.Tags, logger)
+	} else {
+		logger.DebugContext(ctx, "Datadog service disabled")
+	}
+
 	logger.DebugContext(ctx, "Creating game manager instance")
-	managerInstance := manager.New(&manager.Config{}, game, hosting, logger, obs.Spanner, manager.NewHarness(game, logger, obs.Spanner))
+	managerInstance := manager.New(&manager.Config{}, game, hosting, logger, obs.Spanner, manager.NewHarness(game, logger, obs.Spanner), datadogService)
 
 	logger.DebugContext(ctx, "Creating game runner instance")
 	runnerInstance := runner.New("runner", managerInstance, logger, obs.Spanner)
-
-	if err != nil {
-		return nil, fmt.Errorf("error getting lifecycle: %w", err)
-	}
 
 	s := &Services{
 		Logger:  logger,
 		Runner:  runnerInstance,
 		Spanner: obs.Spanner,
+		Datadog: datadogService,
 	}
 
 	logger.DebugContext(ctx, "Game server wrapper services initialized successfully")

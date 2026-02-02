@@ -17,17 +17,16 @@ import (
 	"strings"
 
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5/model"
-	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5/server"
-
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/config"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/constants"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/initialiser"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/platform"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/hosting/gamelift/sdk"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/types/events"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5/model"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5/server"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
@@ -42,6 +41,7 @@ type gamelift struct {
 	logDir           string
 	runId            uuid.UUID
 	gameServerLogDir string
+	sender           CustomMessageSender
 
 	onHealthCheck      func(ctx context.Context) events.GameStatus
 	onHostingStart     func(ctx context.Context, h *events.HostingStart, end <-chan error) error
@@ -51,10 +51,29 @@ type gamelift struct {
 }
 
 type Config struct {
-	GamePort               int
-	Anywhere               config.Anywhere // Contains configuration for GameLift Anywhere fleet
-	LogDirectory           string          // Specifies the directory for general logging
-	GameServerLogDirectory string          // Specifies the directory for game server specific logs
+	GamePort                   int
+	Anywhere                   config.Anywhere // Contains configuration for GameLift Anywhere fleet
+	Orchestration              Orchestration   // Contains configuration settings for messaging the Orchestration Server
+	LogDirectory               string          // Specifies the directory for general logging
+	GameServerLogDirectory     string          // Specifies the directory for game server specific logs
+	InjectFleetRoleCredentials bool            // Toggles calling GetFleetRoleCredentials for managed fleets
+	RoleArn                    string          // Optional: Role ARN to request credentials for
+	RoleSessionName            string          // Optional: Session name to use for assuming the role
+}
+
+// Orchestration defines all configuration settings related to the Orchestration Service.
+type Orchestration struct {
+	AuthHeaderPrefix string   `mapstructure:"authHeaderPrefix" yaml:"authHeaderPrefix"`
+	EmitCustomEvents bool     `mapstructure:"emitCustomEvents" yaml:"emitCustomEvents"`
+	Account          string   `mapstructure:"account" yaml:"account"`
+	Resources        []string `mapstructure:"resources" yaml:"resources"`
+	Method           string   `mapstructure:"method" yaml:"method"`
+	Url              string   `mapstructure:"url" yaml:"url"`
+	HeaderKey        string   `mapstructure:"headerKey" yaml:"headerKey"`
+	HeaderValue      string   `mapstructure:"headerValue" yaml:"headerValue"`
+	GetTokenUrl      string   `mapstructure:"getTokenUrl" yaml:"getTokenUrl"`
+	ClientId         string   `mapstructure:"clientId" yaml:"clientId"`
+	ClientSecret     string   `mapstructure:"clientSecret" yaml:"clientSecret"`
 }
 
 // Init initializes the Amazon GameLift SDK with the provided configuration.
@@ -66,11 +85,21 @@ type Config struct {
 // Returns:
 //   - *hosting.InitMeta: Metadata about the initialized hosting option
 //   - error: Any error that occurred during initialization
-func (gameLift *gamelift) Init(ctx context.Context, args *hosting.InitArgs) (*hosting.InitMeta, error) {
-	gameLift.ctx = ctx
+func (gameLift *gamelift) Init(parentCtx context.Context, args *hosting.InitArgs) (*hosting.InitMeta, error) {
+	gameLift.ctx = parentCtx
 
-	ctx, span, _ := gameLift.spanner.NewSpan(ctx, "Amazon GameLift init", nil)
-	defer span.End()
+	ctx, span, err := gameLift.spanner.NewSpan(parentCtx, "Amazon GameLift init", nil)
+	if ctx == nil {
+		gameLift.logger.WarnContext(ctx, "span returned nil context using parent context as fallback")
+		ctx = parentCtx
+	}
+	if err != nil {
+		gameLift.logger.ErrorContext(ctx, "span setup failed", "err", err)
+	}
+
+	if span != nil {
+		defer span.End()
+	}
 
 	gameLift.logDir = ctx.Value(constants.ContextKeyRunLogDir).(string)
 	if len(gameLift.cfg.GameServerLogDirectory) != 0 {
@@ -78,6 +107,13 @@ func (gameLift *gamelift) Init(ctx context.Context, args *hosting.InitArgs) (*ho
 	}
 
 	gameLift.runId = args.RunId
+
+	sdkVersion, err := gameLift.sdk.GetSdkVersion()
+	if err != nil {
+		gameLift.logger.WarnContext(ctx, "failed to get Amazon GameLift SDK version", "err", err)
+	}
+
+	gameLift.logger.InfoContext(ctx, "initializing Amazon GameLift", "gamePort", gameLift.cfg.GamePort, "logDir", gameLift.logDir, "gameServerLogDir", gameLift.gameServerLogDir, "sdkVersion", sdkVersion)
 
 	if err := gameLift.init.InitSdk(ctx); err != nil {
 		return nil, errors.Wrap(err, "failed to initialize Amazon GameLift")
@@ -97,11 +133,21 @@ func (gameLift *gamelift) Init(ctx context.Context, args *hosting.InitArgs) (*ho
 //
 // Returns:
 //   - error: Any error that occurred during the server process execution
-func (gameLift *gamelift) Run(ctx context.Context) error {
-	gameLift.ctx = ctx
+func (gameLift *gamelift) Run(parentCtx context.Context) error {
+	gameLift.ctx = parentCtx
 
-	ctx, span, _ := gameLift.spanner.NewSpan(ctx, "Amazon GameLift run", nil)
-	defer span.End()
+	ctx, span, err := gameLift.spanner.NewSpan(parentCtx, "Amazon GameLift run", nil)
+	if ctx == nil {
+		gameLift.logger.WarnContext(ctx, "span returned nil context using parent context as fallback")
+		ctx = parentCtx
+	}
+	if err != nil {
+		gameLift.logger.ErrorContext(ctx, "span setup failed", "err", err)
+	}
+
+	if span != nil {
+		defer span.End()
+	}
 
 	logPaths := make([]string, 0)
 	if len(gameLift.logDir) != 0 {
@@ -112,7 +158,7 @@ func (gameLift *gamelift) Run(ctx context.Context) error {
 	}
 
 	// Set SDK tool name and version before calling ProcessReady
-	err := os.Setenv(constants.EnvironmentKeySDKToolName, internal.AppName())
+	err = os.Setenv(constants.EnvironmentKeySDKToolName, internal.AppName())
 	if err != nil {
 		return errors.Wrapf(err, "unable to set SDKToolName environment variable")
 	}
@@ -132,7 +178,6 @@ func (gameLift *gamelift) Run(ctx context.Context) error {
 		OnStartGameSession:  gameLift.glOnStartGameSession,
 		OnUpdateGameSession: gameLift.glOnUpdateGameSession,
 	})
-
 	if err != nil {
 		return errors.Wrapf(err, "failed to call process ready")
 	}
@@ -171,13 +216,11 @@ func (gameLift *gamelift) Close(ctx context.Context) error {
 	gameLift.logger.InfoContext(ctx, "cleaning up Amazon GameLift resources")
 
 	copyErr := copyGameServerLogs(gameLift.logger, gameLift.gameServerLogDir, gameLift.logDir)
-
 	if copyErr != nil {
 		gameLift.ec <- copyErr
 	}
 
-	var err error
-
+	var err error = nil
 	if e := gameLift.sdk.ProcessEnding(ctx); e != nil {
 		gameLift.logger.ErrorContext(ctx, "failed to call process ending", "err", e)
 		err = e
@@ -196,6 +239,8 @@ func (gameLift *gamelift) Close(ctx context.Context) error {
 }
 
 func (gameLift *gamelift) glHealthcheck() bool {
+	_ = gameLift.sender.OnHealthCheck(gameLift.ctx)
+
 	res := gameLift.onHealthCheck(gameLift.ctx)
 	switch res {
 	case events.GameStatusWaiting:
@@ -214,17 +259,27 @@ func (gameLift *gamelift) glHealthcheck() bool {
 }
 
 func (gameLift *gamelift) glOnProcessTerminate() {
-	err := gameLift.onHostingTerminate(gameLift.ctx, &events.HostingTerminate{
+	err := gameLift.sender.OnHostingTerminate(gameLift.ctx)
+	if err != nil {
+		gameLift.ec <- err
+	}
+
+	err = gameLift.onHostingTerminate(gameLift.ctx, &events.HostingTerminate{
 		Reason: events.HostingTerminateReasonHostingShutdown,
 	})
-
 	if err != nil {
 		gameLift.ec <- err
 	}
 }
 
 func (gameLift *gamelift) glOnUpdateGameSession(gs model.UpdateGameSession) {
-	gameLift.logger.DebugContext(gameLift.ctx, "update game session called, but no action is taken by the Game Server Wrapper")
+	gameLift.logger.DebugContext(gameLift.ctx, "update game session called", "gs", gs)
+	err := gameLift.sender.OnUpdateGameSession(gameLift.ctx, gs)
+	if err != nil {
+		gameLift.logger.ErrorContext(gameLift.ctx, "failed to send update game session to orchestration service", "err", err)
+		gameLift.ec <- err
+	}
+	gameLift.logger.DebugContext(gameLift.ctx, "completed update game session")
 }
 
 func (gameLift *gamelift) glOnError(err error) {
@@ -237,15 +292,22 @@ func (gameLift *gamelift) glOnError(err error) {
 }
 
 func (gameLift *gamelift) glOnStartGameSession(gs model.GameSession) {
+	ctx, span, err := gameLift.spanner.NewSpan(gameLift.ctx, "Amazon GameLift OnStartGameSession", nil)
+	gameLift.ctx = context.Background()
+	// gameLift.ctx = ctx
+	if err != nil {
+		gameLift.logger.ErrorContext(ctx, "span setup failed", "err", err)
+	}
 
-	ctx, span, _ := gameLift.spanner.NewSpan(gameLift.ctx, "Amazon GameLift OnStartGameSession", nil)
-	gameLift.ctx = ctx
-	defer span.End()
+	if span != nil && span.IsRecording() {
+		defer span.End()
+	}
 
 	gameLift.logger.DebugContext(gameLift.ctx, "start game sessions called", "gs", gs)
 
 	gameLift.logger.DebugContext(gameLift.ctx, "manager onHostingStart", "event", gs)
 	cliArgs := make([]config.CliArg, 0)
+	envVars := make([]config.EnvVar, 0)
 
 	gamePropertiesBytes, err := json.Marshal(gs.GameProperties)
 	if err != nil {
@@ -256,6 +318,7 @@ func (gameLift *gamelift) glOnStartGameSession(gs model.GameSession) {
 	hse := &events.HostingStart{
 		DNSName:                   gs.DNSName,
 		CliArgs:                   cliArgs,
+		EnvVars:                   envVars,
 		FleetId:                   gs.FleetID,
 		GamePort:                  gs.Port,
 		GameProperties:            gameProperties,
@@ -278,19 +341,49 @@ func (gameLift *gamelift) glOnStartGameSession(gs model.GameSession) {
 		return
 	}
 
+	safeCtx := context.WithoutCancel(ctx)
+	err = gameLift.sender.OnStartGameSession(safeCtx, gs)
+	if err != nil {
+		gameLift.ec <- fmt.Errorf("failed to send message to orchestration service: %w", err)
+	}
+
+	// Log configuration for credential injection
+	isAnywhere := gameLift.cfg.Anywhere.Host.FleetArn != ""
+	gameLift.logger.DebugContext(gameLift.ctx, "GetFleetRoleCredentials configuration",
+		"injectEnabled", gameLift.cfg.InjectFleetRoleCredentials,
+		"anywhereFleet", isAnywhere,
+	)
+
+	// Optionally get fleet role credentials for managed EC2/containers if enabled in config
+	if gameLift.cfg.Anywhere.Host.FleetArn == "" && gameLift.cfg.InjectFleetRoleCredentials {
+		gameLift.logger.DebugContext(gameLift.ctx, "InjectFleetRoleCredentials enabled for managed fleet; attempting to retrieve credentials")
+		// Compute role session name if not provided
+		roleSessionName := gameLift.cfg.RoleSessionName
+		if len(roleSessionName) == 0 {
+			roleSessionName = gameLift.runId.String()
+		}
+		if accessKey, secretKey, sessionToken, credErr := gameLift.sdk.GetFleetRoleCredentials(gameLift.ctx, gameLift.cfg.RoleArn, roleSessionName); credErr != nil {
+			gameLift.logger.WarnContext(gameLift.ctx, "failed to get fleet role credentials", "err", credErr)
+		} else {
+			hse.AwsCredentials = &events.AwsCredentials{
+				AccessKeyId:     accessKey,
+				SecretAccessKey: secretKey,
+				SessionToken:    sessionToken,
+			}
+		}
+	}
+
 	gameLift.logger.DebugContext(gameLift.ctx, "calling onHostingStart")
 	if err := gameLift.onHostingStart(gameLift.ctx, hse, nil); err != nil {
 		gameLift.ec <- err
 	}
-
 }
 
 type InitialiserServiceFactory interface {
 	GetService(ctx context.Context, anywhere config.Anywhere, gameLiftSdk sdk.GameLiftSdk, logger *slog.Logger) (initialiser.Service, error)
 }
 
-func New(ctx context.Context, cfg *Config, logger *slog.Logger, spanner observability.Spanner, initialiserServiceFactory InitialiserServiceFactory, gameLiftSdk sdk.GameLiftSdk) (*gamelift, error) {
-
+func New(ctx context.Context, cfg *Config, logger *slog.Logger, spanner observability.Spanner, initialiserServiceFactory InitialiserServiceFactory, gameLiftSdk sdk.GameLiftSdk, sender CustomMessageSender) (*gamelift, error) {
 	init, err := initialiserServiceFactory.GetService(ctx, cfg.Anywhere, gameLiftSdk, logger)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to create Amazon GameLift initialiser")
@@ -308,6 +401,7 @@ func New(ctx context.Context, cfg *Config, logger *slog.Logger, spanner observab
 		init:    init,
 		logger:  logger,
 		spanner: spanner,
+		sender:  sender,
 	}
 
 	return g, nil
@@ -350,5 +444,13 @@ func copyGameServerLogs(logger *slog.Logger, gameServerLogDir string, logDir str
 			return nil
 		}
 	}
+
 	return fmt.Errorf("error copying source '%v' into destination '%v', error: %v, stderr: %v", gameServerLogDir, logDir, err, stderrStr)
+}
+
+type CustomMessageSender interface {
+	OnUpdateGameSession(ctx context.Context, gs model.UpdateGameSession) error
+	OnHealthCheck(ctx context.Context) error
+	OnHostingTerminate(ctx context.Context) error
+	OnStartGameSession(ctx context.Context, gs model.GameSession) error
 }

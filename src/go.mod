@@ -2,15 +2,16 @@ module github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper
 
 go 1.22.1
 
-replace github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk => ./ext/gamelift-servers-server-sdk
+// replace github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk => ./ext/gamelift-servers-server-sdk
 
 require (
 	github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5 v5.4.0
-	github.com/aws/aws-sdk-go-v2 v1.26.1
+	github.com/aws/aws-sdk-go-v2 v1.39.2
 	github.com/aws/aws-sdk-go-v2/config v1.27.9
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.9
 	github.com/aws/aws-sdk-go-v2/service/gamelift v1.30.3
-	github.com/aws/smithy-go v1.20.2
+	github.com/aws/aws-sdk-go-v2/service/route53 v1.58.4
+	github.com/aws/smithy-go v1.23.0
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/go-logr/logr v1.4.2
 	github.com/go-playground/validator/v10 v10.22.0
@@ -32,14 +33,15 @@ require (
 	go.opentelemetry.io/otel/trace v1.27.0
 	golang.org/x/net v0.33.0
 	golang.org/x/sys v0.28.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
 	github.com/DataDog/datadog-go/v5 v5.6.0 // indirect
 	github.com/Microsoft/go-winio v0.5.0 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.0 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.4 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.4 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.9 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.9 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.11.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.11.6 // indirect
@@ -80,5 +82,4 @@ require (
 	google.golang.org/grpc v1.64.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

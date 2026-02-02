@@ -45,7 +45,9 @@ func (service *Service) Run(ctx context.Context) error {
 	if err := service.runner.Run(ctx); err != nil {
 		return errors.Wrapf(err, "Game server execution failed")
 	}
-	span.End()
+	if span != nil {
+		span.End()
+	}
 
 	service.logger.DebugContext(ctx, "Game server runner completed successfully")
 

@@ -10,6 +10,13 @@
 - [Usage](#usage)
   - [Create Game Session](#create-game-session)
 - [Metrics](#metrics)
+- [Datadog Integration](#datadog-integration)
+  - [Features](#features)
+  - [Configuration](#configuration)
+  - [Template Variables](#template-variables)
+  - [Example Output](#example-output)
+  - [Requirements](#requirements)
+  - [Troubleshooting](#troubleshooting)
 - [Appendix](#appendix)
   - [Game Server Arguments](#game-server-arguments)
   - [Server SDK integration comparison against game server wrapper](#server-sdk-integration-comparison-against-game-server-wrapper)
@@ -513,13 +520,116 @@ Note:
 
 - You can use [TerminateGameSession API](https://docs.aws.amazon.com/gamelift/latest/apireference/API_TerminateGameSession.html) to terminate a game session.
 
-# Metrics
+# Datadog Integration
 
-The Game Server Wrapper supports collecting and publishing telemetry metrics from the managed Amazon GameLift Servers host to
-AWS services for monitoring and observability. For detailed setup and usage instructions, see [METRICS.md](./metrics/METRICS.md).
+The game server wrapper includes built-in support for Datadog monitoring integration. When enabled, the wrapper automatically updates the Datadog agent configuration with dynamic tags based on game session information.
 
-![Telemetry Metrics on Amazon Grafana Dashboard](./metrics/telemetry_metrics.png)
+## Features
 
+- **Automatic Tag Management**: Dynamically adds tags to the Datadog agent configuration when game sessions start
+- **Template Support**: Use Go templates to customize tag values with game session data
+- **Agent Restart**: Automatically restarts the Datadog agent to pick up configuration changes
+- **Graceful Error Handling**: Logs warnings but doesn't fail game startup if Datadog updates fail
+
+## Configuration
+
+Add the following configuration to your `config.yaml` file:
+
+```yaml
+datadog:
+  enabled: true
+  config-path: "/etc/datadog-agent/datadog.yaml"
+  tags:
+    # Basic session information
+    session_name: "{{.GameSessionName}}"
+    fleet_id: "{{.FleetId}}"
+    game_session_id: "{{.GameSessionId}}"
+    
+    # Network information
+    dns_name: "{{.DNSName}}"
+    ip_address: "{{.IpAddress}}"
+    
+    # Game data
+    game_properties: "{{.GameProperties}}"
+    matchmaker_data: "{{.MatchmakerData}}"
+    
+    # Provider information
+    provider: "{{.Provider}}"
+    
+    # Static tags
+    service: "game-server"
+    environment: "production"
+```
+
+### Configuration Options
+
+- `enabled`: Enable or disable Datadog integration (default: false)
+- `config-path`: Path to the Datadog agent configuration file (default: "/etc/datadog-agent/datadog.yaml")
+- `tags`: Map of tag names to template strings for dynamic tag generation
+
+## Template Variables
+
+The following variables are available for use in tag templates:
+
+| Variable | Description |
+|----------|-------------|
+| `.GameSessionName` | The name of the game session |
+| `.GameSessionId` | The unique identifier of the game session |
+| `.FleetId` | The fleet identifier |
+| `.DNSName` | The DNS name for the game session |
+| `.IpAddress` | The IP address of the game session |
+| `.GameProperties` | JSON string of game properties |
+| `.MatchmakerData` | JSON string of matchmaker data |
+| `.Provider` | The hosting provider (e.g., "gamelift") |
+| `.GamePort` | The game port number |
+| `.MaximumPlayerSessionCount` | Maximum number of player sessions |
+
+## Example Output
+
+When a game session starts, the wrapper will add tags like this to your Datadog configuration:
+
+```yaml
+tags:
+  - session_name:my-game-session-123
+  - fleet_id:fleet-8a8e55eb-6607-4eb3-9031-eed48907d5a4
+  - game_session_id:arn:aws:gamelift:eu-west-1::gamesession/fleet-8a8e55eb-6607-4eb3-9031-eed48907d5a4/dev-jim/6aa3a161-f2fb-4b53-bfd9-1f31c3b20cd2
+  - dns_name:ec2-1-2-3-4.compute-1.amazonaws.com
+  - ip_address:192.168.1.100
+  - provider:gamelift
+  - service:game-server
+  - environment:production
+```
+
+## Requirements
+
+- Datadog agent must be installed and running on the system
+- The wrapper must have write permissions to the Datadog configuration file
+- The system must support `systemctl` for agent restart (Linux systems)
+- The wrapper must have sudo privileges to restart the datadog agent
+
+### Permission Setup
+
+Since the Datadog agent typically runs as `dd-agent` user and owns its configuration files, you need to grant the `gl-user-server` user access. Here are the recommended approaches:
+
+#### Option 1: Group-Based Access (Recommended)
+```bash
+# Add gl-user-server to dd-agent group
+sudo usermod -a -G dd-agent gl-user-server
+
+# Set appropriate permissions
+sudo chmod 775 /etc/datadog-agent/
+sudo chown dd-agent:dd-agent /etc/datadog-agent/datadog.yaml
+sudo chmod 664 /etc/datadog-agent/datadog.yaml
+```
+
+### Sudo Configuration
+
+The wrapper needs sudo privileges to restart the datadog agent.
+
+```bash
+# Add gl-user-server to sudoers for datadog agent restart only
+echo "gl-user-server ALL=(ALL) NOPASSWD: /bin/systemctl restart datadog-agent" | sudo tee /etc/sudoers.d/gamelift-wrapper
+```
 
 # Appendix
 ## Game Server Arguments
@@ -558,9 +668,10 @@ Example of configuration of arguments:
 ```
 
 ## Metrics
-The Game Server Wrapper support collecting and publishing telemetry metrics from the managed Amazon GameLift Servers host to
+The Game Server Wrapper supports collecting and publishing telemetry metrics from the managed Amazon GameLift Servers host to
 AWS services for monitoring and observability. For detailed setup and usage instructions, see [METRICS.md](./metrics/METRICS.md).
 
+![Telemetry Metrics on Amazon Grafana Dashboard](./metrics/telemetry_metrics.png)
 
 
 ## Server SDK integration comparison against game server wrapper

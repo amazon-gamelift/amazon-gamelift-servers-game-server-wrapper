@@ -12,6 +12,7 @@ import (
 // HostingStart represents the initialization configuration for a game server instance.
 type HostingStart struct {
 	CliArgs                   []config.CliArg
+	EnvVars                   []config.EnvVar
 	ContainerPort             int
 	DNSName                   string
 	FleetId                   string
@@ -25,4 +26,12 @@ type HostingStart struct {
 	MatchmakerData            string
 	MaximumPlayerSessionCount int
 	Provider                  config.Provider
+	AwsCredentials            *AwsCredentials
+}
+
+// AwsCredentials represents temporary AWS credentials provided by GameLift fleet role.
+type AwsCredentials struct {
+	AccessKeyId     string
+	SecretAccessKey string
+	SessionToken    string
 }

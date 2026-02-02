@@ -13,7 +13,9 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"syscall"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -101,15 +103,38 @@ func (process *process) Run(ctx context.Context, args *Args, pidChan chan<- int)
 	process.cmd.Dir = process.cfg.WorkingDirectory
 
 	if process.cfg.EnvVars != nil {
-		env := make([]string, 0)
+		// Preserve parent environment and overlay configured variables
+		base := os.Environ()
+		envMap := make(map[string]string, len(base)+len(process.cfg.EnvVars))
+		for _, kv := range base {
+			for i := 0; i < len(kv); i++ {
+				if kv[i] == '=' {
+					envMap[kv[:i]] = kv[i+1:]
+					break
+				}
+			}
+		}
 		for k, v := range process.cfg.EnvVars {
-			line := fmt.Sprintf("%s=%s", k, v)
-			env = append(env, line)
+			envMap[k] = v
+		}
+		env := make([]string, 0, len(envMap))
+		for k, v := range envMap {
+			env = append(env, fmt.Sprintf("%s=%s", strings.ToUpper(k), v))
 		}
 		process.cmd.Env = env
 	}
 
 	process.logger.InfoContext(ctx, "Starting process", "path", process.exePath, "args", args)
+	if process.cfg.DelayStart != "" {
+		process.logger.InfoContext(ctx, "DelayStart requested", "delay", process.cfg.DelayStart)
+		d, err := time.ParseDuration(process.cfg.DelayStart)
+		if err != nil {
+			process.logger.WarnContext(ctx, "Unable to parse duration, defaulting to 10s")
+			time.Sleep(time.Duration(10) * time.Second)
+		} else {
+			time.Sleep(d)
+		}
+	}
 	err := process.cmd.Start()
 	if err != nil {
 		return res, err
@@ -149,6 +174,7 @@ type Config struct {
 	ExeName          string
 	WorkingDirectory string
 	EnvVars          map[string]string
+	DelayStart       string
 }
 
 // New creates a new Process instance with the provided configuration and logger.

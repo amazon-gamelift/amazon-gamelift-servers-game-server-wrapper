@@ -29,39 +29,87 @@ type Runner struct {
 	spanner observability.Spanner
 }
 
-func (runner *Runner) Run(ctx context.Context) error {
-	runId := ctx.Value(constants.ContextKeyRunId).(uuid.UUID)
-	ctx, cancel := context.WithCancel(ctx)
+func (runner *Runner) Run(parentCtx context.Context) error {
+	// Guard parent ctx containing required context types
+	if parentCtx == nil {
+		runner.logger.Warn("parent context is nil; substituting background context")
+		parentCtx = context.Background()
+	}
+	val := parentCtx.Value(constants.ContextKeyRunId)
+	if val == nil {
+		runner.logger.Error("context missing run ID")
+		return errors.New("missing run ID in context")
+	}
+	runId, ok := val.(uuid.UUID)
+	if !ok {
+		runner.logger.Error("context run ID is wrong type")
+		return errors.New("run ID in context not UUID")
+	}
+
+	cancelCtx, cancel := context.WithCancel(parentCtx)
 	defer cancel()
 
-	ctx, span, _ := runner.spanner.NewSpan(ctx, runner.name, nil)
+	ctx, span, err := runner.spanner.NewSpan(cancelCtx, runner.name, nil)
+	if ctx == nil {
+		runner.logger.WarnContext(ctx, "span returned nil context using parent context as fallback")
+		ctx = cancelCtx
+	}
+	if err != nil {
+		runner.logger.ErrorContext(ctx, "span setup failed", "err", err)
+	}
+
+	if span != nil {
+		defer span.End()
+	}
+
 	defer span.End()
 
 	runner.logger.DebugContext(ctx, "Starting a new run", "run-id", runId)
 
-	ctx, span1, _ := runner.spanner.NewSpan(ctx, "init", nil)
-	err := runner.mgr.Init(ctx, runId)
-	span1.End()
+	ctx, span1, err := runner.spanner.NewSpan(cancelCtx, "init", nil)
+	if ctx == nil {
+		runner.logger.WarnContext(ctx, "span returned nil context using parent context as fallback")
+		ctx = cancelCtx
+	}
+	if err != nil {
+		runner.logger.ErrorContext(ctx, "span setup failed", "err", err)
+	}
+	err = runner.mgr.Init(ctx, runId)
+	if span1 != nil {
+		span1.End()
+	}
 	if err != nil {
 		return errors.Wrapf(err, "Runner %s failed to initialize", runner.name)
 	}
 
 	runner.logger.DebugContext(ctx, "Executing the run")
-	ctx, span2, _ := runner.spanner.NewSpan(ctx, runner.name, nil)
-	if err := runner.mgr.Run(ctx, runId); err != nil {
+	ctx, span2, err := runner.spanner.NewSpan(cancelCtx, runner.name, nil)
+	if ctx == nil {
+		runner.logger.WarnContext(ctx, "span returned nil context using parent context as fallback")
+		ctx = cancelCtx
+	}
+	if err != nil {
+		runner.logger.ErrorContext(ctx, "span setup failed", "err", err)
+	}
+	err = runner.mgr.Run(ctx, runId)
+
+	if span2 != nil {
 		span2.End()
+	}
+	if err != nil {
 		return errors.Wrapf(err, "Runner %s failed to run", runner.name)
 	}
-	span2.End()
 
 	runner.logger.DebugContext(ctx, "Starting to clean up the run")
 
 	ctx, span3, _ := runner.spanner.NewSpan(ctx, "close", nil)
-	if err := runner.mgr.Close(ctx); err != nil {
+	err = runner.mgr.Close(ctx)
+	if span3 != nil {
 		span3.End()
+	}
+	if err != nil {
 		return errors.Wrapf(err, "Runner %s failed to close", runner.name)
 	}
-	span3.End()
 
 	runner.logger.DebugContext(ctx, "Run cleaned up")
 	return nil

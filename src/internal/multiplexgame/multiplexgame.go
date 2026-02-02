@@ -6,21 +6,26 @@
 package multiplexgame
 
 import (
+	"bytes"
 	"context"
-	"errors"
+	"encoding/json"
 	"fmt"
+	"html/template"
 	"io"
 	"log/slog"
+	"net/http"
 	"os"
-	"strings"
 
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/config"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/internal/multiplexgame/args"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/game"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/helpers"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/logging"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/observability"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/process"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/route53manager"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/types/events"
+	"github.com/pkg/errors"
 )
 
 // New creates a new MultiplexGame instance with the provided configuration and dependencies.
@@ -110,6 +115,15 @@ func (multiplexGame *MultiplexGame) Run(ctx context.Context, startArgs *game.Sta
 	ctx, span, _ := multiplexGame.spanner.NewSpan(ctx, "run", nil)
 	defer span.End()
 
+	// Setup Route53
+	requestHandler := helpers.NewHttpRequestHandler(http.DefaultClient, multiplexGame.logger)
+	if multiplexGame.cfg.Route53.DoMapping {
+		err := route53manager.SetupRoute53Mappings(ctx, multiplexGame.logger, startArgs.GameSessionName, &multiplexGame.cfg, startArgs.AwsCredentials, requestHandler)
+		if err != nil {
+			multiplexGame.logger.ErrorContext(ctx, "Could not set up Route 53 mapping", "err", err)
+		}
+	}
+
 	if multiplexGame.cfg.Ports.GamePort == 0 {
 		return errors.New("game server initialization failed: invalid game port: 0")
 	}
@@ -150,6 +164,70 @@ func (multiplexGame *MultiplexGame) Run(ctx context.Context, startArgs *game.Sta
 		return fmt.Errorf("failed to generate process arguments: %w", err)
 	}
 	multiplexGame.logger.DebugContext(ctx, "cli args: ", "args", processArgs)
+
+	if startArgs != nil {
+		procCfg := &process.Config{
+			EnvVars:          map[string]string{},
+			WorkingDirectory: build.WorkingDir,
+			ExeName:          build.RelativeExePath,
+			DelayStart:       build.DelayStart,
+		}
+
+		if startArgs.GameProperties != "" {
+			passedArgs := make(map[string]string)
+			err := json.Unmarshal([]byte(startArgs.GameProperties), &passedArgs)
+			if err != nil {
+				multiplexGame.logger.Error("Failed to unmarshall process args: ", "error", err)
+				return fmt.Errorf("failed to unmarshall process args: %w", err)
+			}
+
+			for k, v := range passedArgs {
+				procCfg.EnvVars[k] = v
+			}
+		}
+
+		// If AWS credentials were provided in the hosting start event, set them as env vars for the child process
+		if startArgs.HostingStart != nil && startArgs.HostingStart.AwsCredentials != nil {
+			awsCredentials := startArgs.HostingStart.AwsCredentials
+			awsEnvVars := map[string]string{
+				"AWS_ACCESS_KEY_ID":     awsCredentials.AccessKeyId,
+				"AWS_SECRET_ACCESS_KEY": awsCredentials.SecretAccessKey,
+				"AWS_SESSION_TOKEN":     awsCredentials.SessionToken,
+			}
+
+			for k, v := range awsEnvVars {
+				procCfg.EnvVars[k] = v
+			}
+		}
+
+		// Add start args as env variables.
+		startArgs.CliArgs = append(startArgs.CliArgs, build.DefaultArgs...)
+
+		for _, arg := range multiplexGame.cfg.BuildDetail.EnvVars {
+			val := arg.Value
+			t, err := template.New(arg.Name).Parse(val)
+			if err != nil {
+				return errors.Wrapf(err, "failed to parse arg template for %s", arg.Name)
+			}
+
+			var b bytes.Buffer
+			if err := t.Execute(&b, startArgs); err != nil {
+				return errors.Wrapf(err, "failed to execute arg template for %s", arg.Name)
+			}
+
+			value := b.String()
+			procCfg.EnvVars[arg.Name] = value
+		}
+
+		for k := range procCfg.EnvVars {
+			multiplexGame.logger.DebugContext(ctx, "added env var", "name", k)
+		}
+
+		multiplexGame.proc = process.New(procCfg, multiplexGame.logger)
+		if err := multiplexGame.proc.Init(ctx); err != nil {
+			return fmt.Errorf("failed to initialize game process with credentials: %w", err)
+		}
+	}
 
 	multiplexGame.logger.DebugContext(ctx, "Creating log files")
 	if err := multiplexGame.createLogStreams(ctx, startArgs.LogDirectory); err != nil {
@@ -220,19 +298,11 @@ func (multiplexGame *MultiplexGame) initProcess(ctx context.Context, build confi
 
 	multiplexGame.logger.DebugContext(ctx, "Working directory validated successfully", "dir", build.WorkingDir)
 
-	envMap := make(map[string]string)
-	for _, env := range os.Environ() {
-		pair := strings.SplitN(env, "=", 2)
-		if len(pair) == 2 {
-			envMap[pair[0]] = pair[1]
-		}
-	}
-	multiplexGame.logger.DebugContext(ctx, "Passing wrapper's environment variables to game process", "envVarsCount", len(envMap))
-
 	procCfg := &process.Config{
-		EnvVars:          envMap,
+		EnvVars:          make(map[string]string),
 		WorkingDirectory: build.WorkingDir,
 		ExeName:          build.RelativeExePath,
+		DelayStart:       build.DelayStart,
 	}
 	multiplexGame.proc = process.New(procCfg, multiplexGame.logger)
 

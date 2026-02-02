@@ -6,15 +6,15 @@
 package mocks
 
 import (
-	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/process"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5/server"
+
+	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/process"
 	"github.com/google/uuid"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/net/context"
 )
 
-type SpannerMock struct {
-}
+type SpannerMock struct{}
 
 func (spannerMock *SpannerMock) NewSpan(ctx context.Context, name string, meta map[string]string) (context.Context, trace.Span, error) {
 	return ctx, trace.SpanFromContext(ctx), nil
@@ -58,6 +58,14 @@ type GameLiftSdkMock struct {
 	ProcessEndingCalled          bool
 	ActivateGameSessionCalled    bool
 	DestroyCalled                bool
+	FleetRoleAccessKeyId         string
+	FleetRoleSecretAccessKey     string
+	FleetRoleSessionToken        string
+	GetFleetRoleCredentialsError error
+	LastRoleArn                  string
+	LastRoleSessionName          string
+	SdkVersionError              error
+	GetSdkVersionCalled          bool
 }
 
 func (gameLiftSdkMock *GameLiftSdkMock) InitSDK(ctx context.Context, params server.ServerParameters) error {
@@ -90,4 +98,15 @@ func (gameLiftSdkMock *GameLiftSdkMock) ActivateGameSession(ctx context.Context)
 func (gameLiftSdkMock *GameLiftSdkMock) Destroy(ctx context.Context) error {
 	gameLiftSdkMock.DestroyCalled = true
 	return gameLiftSdkMock.InitSdkError
+}
+
+func (gameLiftSdkMock *GameLiftSdkMock) GetFleetRoleCredentials(ctx context.Context, roleArn string, roleSessionName string) (string, string, string, error) {
+	gameLiftSdkMock.LastRoleArn = roleArn
+	gameLiftSdkMock.LastRoleSessionName = roleSessionName
+	return gameLiftSdkMock.FleetRoleAccessKeyId, gameLiftSdkMock.FleetRoleSecretAccessKey, gameLiftSdkMock.FleetRoleSessionToken, gameLiftSdkMock.GetFleetRoleCredentialsError
+}
+
+func (gameLiftSdkMock *GameLiftSdkMock) GetSdkVersion() (string, error) {
+	gameLiftSdkMock.GetSdkVersionCalled = true
+	return "mock", gameLiftSdkMock.SdkVersionError
 }

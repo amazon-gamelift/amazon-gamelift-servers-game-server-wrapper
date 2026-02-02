@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/amazon-gamelift/amazon-gamelift-servers-game-server-wrapper/pkg/types/events"
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5/model"
 	"golang.org/x/net/context"
 )
 
@@ -82,4 +83,50 @@ func (hostingServiceMock *HostingServiceMock) Close(ctx context.Context) error {
 	hostingServiceMock.CloseCalled = true
 	hostingServiceMock.SetOnHealthCheckCount++
 	return hostingServiceMock.CloseError
+}
+
+type CustomMessageSenderMock struct {
+	OnUpdateGameSessionError  error
+	OnUpdateGameSessionInput  model.UpdateGameSession
+	OnUpdateGameSessionCalled bool
+	OnUpdateGameSessionCount  int
+
+	OnHealthCheckError  error
+	OnHealthCheckCalled bool
+	OnHealthCheckCount  int
+
+	OnHostingTerminateError  error
+	OnHostingTerminateCalled bool
+	OnHostingTerminateCount  int
+
+	OnStartGameSessionError  error
+	OnStartGameSessionInput  model.GameSession
+	OnStartGameSessionCalled bool
+	OnStartGameSessionCount  int
+}
+
+func (c *CustomMessageSenderMock) OnUpdateGameSession(_ context.Context, gs model.UpdateGameSession) error {
+	c.OnUpdateGameSessionCalled = true
+	c.OnUpdateGameSessionCount++
+	c.OnUpdateGameSessionInput = gs
+	return c.OnUpdateGameSessionError
+}
+
+func (c *CustomMessageSenderMock) OnHealthCheck(_ context.Context) error {
+	c.OnHealthCheckCalled = true
+	c.OnHealthCheckCount++
+	return c.OnHealthCheckError
+}
+
+func (c *CustomMessageSenderMock) OnHostingTerminate(_ context.Context) error {
+	c.OnHostingTerminateCalled = true
+	c.OnHostingTerminateCount++
+	return c.OnHostingTerminateError
+}
+
+func (c *CustomMessageSenderMock) OnStartGameSession(_ context.Context, gs model.GameSession) error {
+	c.OnStartGameSessionCalled = true
+	c.OnStartGameSessionCount++
+	c.OnStartGameSessionInput = gs
+	return c.OnStartGameSessionError
 }

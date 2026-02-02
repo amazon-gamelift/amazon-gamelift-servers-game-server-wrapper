@@ -14,6 +14,36 @@ anywhere:
 ports:
   gamePort: 37016
 
+orchestration:
+  emitCustomEvents: true
+  account:  "aws account used for the game server"
+  resources: "the arn of the game session queue to process the emitted requests"
+  method: "the http request method to use for all emitted requests, i.e. POST"
+  url: "the url to emit the events to"
+  headerKey: "a header key to add to all emitted requests"
+  headerValue: "a header value to add to all emitted requests"
+  getTokenUrl: "the url of the endpoint that will provide the authorisation token"
+  clientId: "the client id for the authorisation endpoint"
+  clientSecret: "the client secret for the authorisation endpoint"
+  authHeaderPrefix: "the prefix to use in the authorization header, e.g. 'Basic'"
+
+route53:
+  doMapping: true
+  hostDomain: "host domain to map"
+  ttl: 60
+  comment: "a comment to append to created route 53 records"
+  publicHostedZoneId: "the public hosted zone id to map"
+  privateHostedZoneId: "the private hosted zone id to map"
+  tokenUrl: "the url to retrieve the metadata token from"
+  tokenHeaderKey: "the header key to pass with the request for the metadata token"
+  tokenHeaderValue: "the value of the header to be passed with the metadata token"
+  metaDataUrl: "the url to retrieve the metadata from"
+  metaDataHeaderKey: "the value of the header key to pass the metadata token in"
+  publicIpUrl: "the value of the url to get the public ip from.  this must include '{{metaData}}' as a location to insert the metadata"
+  privateIpUrl: "the value of the url to get the private ip from.  this must include '{{metaData}}' as a location to insert the metadata"
+  region: "the AWS region to perform route53 setup in, i.e. eu-central-1"
+  profile: "the aws profile to use for route53 setup"
+
 game-server-details:
   executable-file-path: ./MyGame/my-server-executable
   game-server-args:

@@ -50,7 +50,7 @@ func CreateManagerTestHelper() ManagerTestHelper {
 		Delay: time.Second,
 	}
 
-	managerService := New(&Config{}, &gameService, &hostingService, logger, &spannerMock, &harness)
+	managerService := New(&Config{}, &gameService, &hostingService, logger, &spannerMock, &harness, nil)
 	return ManagerTestHelper{
 		Logger:         logger,
 		LogBuffer:      &logBuffer,

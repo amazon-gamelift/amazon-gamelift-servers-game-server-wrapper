@@ -9,7 +9,9 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5/model/request"
 	"github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5/server"
+	"github.com/pkg/errors"
 )
 
 // GameLiftSdk defines the interface for interacting with server SDK for Amazon GameLift Servers.
@@ -30,8 +32,14 @@ type GameLiftSdk interface {
 	// activated a game session and is now ready to receive player connections.
 	ActivateGameSession(ctx context.Context) error
 
+	// GetFleetRoleCredentials retrieves temporary IAM credentials associated with the fleet role.
+	GetFleetRoleCredentials(ctx context.Context, roleArn string, roleSessionName string) (accessKeyId string, secretAccessKey string, sessionToken string, err error)
+
 	// Destroy frees the server SDK for Amazon GameLift Servers from memory.
 	Destroy(ctx context.Context) error
+
+	// Get SDK version
+	GetSdkVersion() (string, error)
 }
 
 type Sdk struct {
@@ -68,9 +76,30 @@ func (sdk *Sdk) ActivateGameSession(ctx context.Context) error {
 	return server.ActivateGameSession()
 }
 
+func (sdk *Sdk) GetFleetRoleCredentials(ctx context.Context, roleArn string, roleSessionName string) (string, string, string, error) {
+	sdk.logger.DebugContext(ctx, "GetFleetRoleCredentials called", "roleArn", roleArn, "roleSessionName", roleSessionName)
+	req := request.NewGetFleetRoleCredentials()
+	req.RoleArn = roleArn
+	req.RoleSessionName = roleSessionName
+	creds, err := server.GetFleetRoleCredentials(req)
+	if err != nil {
+		return "", "", "", err
+	}
+	return creds.AccessKeyID, creds.SecretAccessKey, creds.SessionToken, nil
+}
+
 func (sdk *Sdk) Destroy(ctx context.Context) error {
 	sdk.logger.DebugContext(ctx, "Destroy called")
 	return server.Destroy()
+}
+
+func (sdk *Sdk) GetSdkVersion() (string, error) {
+	version, err := server.GetSdkVersion()
+	if err != nil {
+		return "", errors.Wrap(err, "failed to get SDK version")
+	}
+
+	return version, nil
 }
 
 func NewSdk(ctx context.Context, logger *slog.Logger) *Sdk {

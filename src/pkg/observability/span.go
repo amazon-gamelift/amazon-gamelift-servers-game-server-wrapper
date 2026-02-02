@@ -60,9 +60,17 @@ func (spanner *spanner) NewSpanWithTraceId(ctx context.Context, name string, tra
 	return ctx, span, nil
 }
 
-func (spanner *spanner) NewSpan(ctx context.Context, name string, meta map[string]string) (context.Context, trace.Span, error) {
-	ctx, span := spanner.tracer.Start(ctx, name)
+func (spanner *spanner) NewSpan(parent context.Context, name string, meta map[string]string) (context.Context, trace.Span, error) {
+	if parent == nil {
+		// Always return safe context, ensure game runtime
+		parent = context.Background()
+	}
+	ctx, span := spanner.tracer.Start(parent, name)
 
+	if ctx == nil {
+		// Always return a safe context to ensure game runtime
+		ctx = context.Background()
+	}
 	attr := make([]attribute.KeyValue, 0)
 	for k, v := range meta {
 		a := attribute.String(k, v)
