@@ -448,7 +448,7 @@ aws gamelift create-container-group-definition \
 --operating-system AMAZON_LINUX_2023 \
 --total-memory-limit-mebibytes 1024 \
 --total-vcpu-limit 1 \
---game-server-container-definition "{\"ContainerName\": \"GameServer\", \"ImageUri\": \"${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/gamelift-sdk-wrapper-sample:latest\", \"PortConfiguration\": {\"ContainerPortRanges\": [{\"FromPort\": 37016, \"ToPort\": 37020, \"Protocol\": \"TCP\"}]}, \"ServerSdkVersion\": \"5.4.0\"}"
+--game-server-container-definition "{\"ContainerName\": \"GameServer\", \"ImageUri\": \"${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/gamelift-sdk-wrapper-sample:latest\", \"PortConfiguration\": {\"ContainerPortRanges\": [{\"FromPort\": 37016, \"ToPort\": 37020, \"Protocol\": \"TCP\"}, {\"FromPort\": 37016, \"ToPort\": 37020, \"Protocol\": \"UDP\"}]}, \"ServerSdkVersion\": \"5.4.0\"}"
 ```
 Wait for it to be READY before proceeding. You can check its status using [AWS console](https://console.aws.amazon.com/gamelift/container-groups) or [DescribeContainerGroupDefinition API](https://docs.aws.amazon.com/gamelift/latest/apireference/API_DescribeContainerGroupDefinition.html)
 ### Create Container Fleet Role
