@@ -8,7 +8,7 @@ default: test
 COMPUTE_TYPES ?= managed-ec2 anywhere managed-containers
 
 MAJOR ?= 1
-MINOR ?= 1
+MINOR ?= 2
 PATCH ?= 0
 APP_NAME ?= amazon-gamelift-servers-game-server-wrapper
 APP_PACKAGE ?= github.com/amazon-gamelift/$(APP_NAME)

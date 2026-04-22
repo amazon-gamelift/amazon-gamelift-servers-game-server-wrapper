@@ -151,7 +151,7 @@ func (service *service) Close(ctx context.Context) error {
 		if err == nil {
 			err = hostingErr
 		} else {
-			err = errors.Wrapf(err, hostingErr.Error())
+			err = errors.Wrapf(err, "%s", hostingErr.Error())
 		}
 	}
 

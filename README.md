@@ -27,7 +27,7 @@ The game server wrapper enables rapid onboarding to Amazon GameLift Servers, sup
 ### Any Game Server Executable
 A game sever executable is required.
 
-### Go programming language, v1.18+
+### Go programming language, v1.24+
 The game server wrapper is implemented in Go. Follow the Go installation guide for your platform: https://go.dev/doc/install
 
 ### AWS CLI
@@ -556,12 +556,6 @@ Example of configuration of arguments:
           val: "{{.GameSessionId}}"
           pos: 2
 ```
-
-## Metrics
-The Game Server Wrapper support collecting and publishing telemetry metrics from the managed Amazon GameLift Servers host to
-AWS services for monitoring and observability. For detailed setup and usage instructions, see [METRICS.md](./metrics/METRICS.md).
-
-
 
 ## Server SDK integration comparison against game server wrapper
 The game server wrapper automatically calls some methods from the server SDK for Amazon GameLift servers. To take full advantage of all of the methods, game servers must integrate with the server SDK instead of the game server wrapper.
