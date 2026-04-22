@@ -27,7 +27,7 @@ The game server wrapper enables rapid onboarding to Amazon GameLift Servers, sup
 ### Any Game Server Executable
 A game sever executable is required.
 
-### Go programming language, v1.18+
+### Go programming language, v1.24+
 The game server wrapper is implemented in Go. Follow the Go installation guide for your platform: https://go.dev/doc/install
 
 ### AWS CLI
@@ -448,7 +448,7 @@ aws gamelift create-container-group-definition \
 --operating-system AMAZON_LINUX_2023 \
 --total-memory-limit-mebibytes 1024 \
 --total-vcpu-limit 1 \
---game-server-container-definition "{\"ContainerName\": \"GameServer\", \"ImageUri\": \"${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/gamelift-sdk-wrapper-sample:latest\", \"PortConfiguration\": {\"ContainerPortRanges\": [{\"FromPort\": 37016, \"ToPort\": 37020, \"Protocol\": \"TCP\"}]}, \"ServerSdkVersion\": \"5.4.0\"}"
+--game-server-container-definition "{\"ContainerName\": \"GameServer\", \"ImageUri\": \"${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/gamelift-sdk-wrapper-sample:latest\", \"PortConfiguration\": {\"ContainerPortRanges\": [{\"FromPort\": 37016, \"ToPort\": 37020, \"Protocol\": \"TCP\"}, {\"FromPort\": 37016, \"ToPort\": 37020, \"Protocol\": \"UDP\"}]}, \"ServerSdkVersion\": \"5.4.0\"}"
 ```
 Wait for it to be READY before proceeding. You can check its status using [AWS console](https://console.aws.amazon.com/gamelift/container-groups) or [DescribeContainerGroupDefinition API](https://docs.aws.amazon.com/gamelift/latest/apireference/API_DescribeContainerGroupDefinition.html)
 ### Create Container Fleet Role
@@ -556,12 +556,6 @@ Example of configuration of arguments:
           val: "{{.GameSessionId}}"
           pos: 2
 ```
-
-## Metrics
-The Game Server Wrapper support collecting and publishing telemetry metrics from the managed Amazon GameLift Servers host to
-AWS services for monitoring and observability. For detailed setup and usage instructions, see [METRICS.md](./metrics/METRICS.md).
-
-
 
 ## Server SDK integration comparison against game server wrapper
 The game server wrapper automatically calls some methods from the server SDK for Amazon GameLift servers. To take full advantage of all of the methods, game servers must integrate with the server SDK instead of the game server wrapper.
