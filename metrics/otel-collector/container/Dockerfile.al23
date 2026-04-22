@@ -35,6 +35,9 @@ RUN yum install -y dotnet && \
 # Add game files
 ADD ./game /local/game/
 
+# Set working directory for the game process
+WORKDIR /local/game
+
 # Copy the game startup script
 COPY ./entrypoint-game.sh /local/
 RUN chmod +x /local/*.sh
@@ -42,4 +45,4 @@ RUN chmod +x /local/*.sh
 # Copy .env file for environment variables
 COPY ./.env /opt/aws/gl-otel-collector/etc/.env
 
-ENTRYPOINT ["/bin/bash", "-c", "set -a; source /opt/aws/gl-otel-collector/etc/.env; set +a; exec usr/local/bin/supervisord -c /etc/supervisord.conf "]
+ENTRYPOINT ["/bin/bash", "-c", "set -a; source /opt/aws/gl-otel-collector/etc/.env; set +a; exec /usr/local/bin/supervisord -c /etc/supervisord.conf "]

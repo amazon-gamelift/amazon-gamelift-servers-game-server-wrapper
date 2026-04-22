@@ -186,7 +186,7 @@ func (gameLift *gamelift) Close(ctx context.Context) error {
 	if e := gameLift.sdk.Destroy(ctx); e != nil {
 		gameLift.logger.ErrorContext(ctx, "failed to call destroy", "err", e)
 		if err != nil {
-			err = errors.Wrapf(err, e.Error())
+			err = errors.Wrapf(err, "%s", e.Error())
 		} else {
 			err = e
 		}
