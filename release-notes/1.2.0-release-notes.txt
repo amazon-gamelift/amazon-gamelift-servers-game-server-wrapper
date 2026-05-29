@@ -1,0 +1,2 @@
+- Upgraded Wrapper dependencies to newer versions.
+- Fixed WORKDIR in metrics Dockerfile to address a container fleet startup issue.
