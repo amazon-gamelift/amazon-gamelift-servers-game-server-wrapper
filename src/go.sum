@@ -2,8 +2,8 @@ github.com/DataDog/datadog-go/v5 v5.6.0 h1:2oCLxjF/4htd55piM75baflj/KoE6VYS7alEU
 github.com/DataDog/datadog-go/v5 v5.6.0/go.mod h1:K9kcYBlxkcPP8tvvjZZKs/m1edNAUFzBbdpTUKfCsuw=
 github.com/Microsoft/go-winio v0.5.0 h1:Elr9Wn+sGKPlkaBvwu4mTrxtmOp3F3yV9qhaHbXGjwU=
 github.com/Microsoft/go-winio v0.5.0/go.mod h1:JPGBdM1cNvN/6ISo+n8V5iA4v8pBzdOpzfwIujj1a84=
-github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5 v5.4.0 h1:Np9sUYUEQbONDRrsVc5p/DxnILigcpq09qdYEOj73TE=
-github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5 v5.4.0/go.mod h1:hNhmNbGSuGJRA7tObauk40kaY8703yM+TIPfj/vIERU=
+github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5 v5.4.1 h1:8wmlBfp6mrvOdQ0NL6oytNOQ8LjphvQOhzLxpTGBUjU=
+github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5 v5.4.1/go.mod h1:hNhmNbGSuGJRA7tObauk40kaY8703yM+TIPfj/vIERU=
 github.com/aws/aws-sdk-go-v2 v1.26.1 h1:5554eUqIYVWpU0YmeeYZ0wU64H2VLBs8TlhRB2L+EkA=
 github.com/aws/aws-sdk-go-v2 v1.26.1/go.mod h1:ffIFB97e2yNsv4aTSGkqtHnppsIJzw7G7BReUZ3jCXM=
 github.com/aws/aws-sdk-go-v2/config v1.27.9 h1:gRx/NwpNEFSk+yQlgmk1bmxxvQ5TyJ76CWXs9XScTqg=
