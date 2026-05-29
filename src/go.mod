@@ -5,7 +5,7 @@ go 1.24.0
 replace github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk => ./ext/gamelift-servers-server-sdk
 
 require (
-	github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5 v5.4.0
+	github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/v5 v5.4.1
 	github.com/aws/aws-sdk-go-v2 v1.26.1
 	github.com/aws/aws-sdk-go-v2/config v1.27.9
 	github.com/aws/aws-sdk-go-v2/credentials v1.17.9

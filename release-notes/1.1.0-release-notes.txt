@@ -1,0 +1,2 @@
+- Adds support for publishing more host and fleet metrics, with pre-built dashboards for visualizing usage data.
+- Improves the wrapper functionality by passing all environment variables from the wrapper to the game executable.
