@@ -1,0 +1,2 @@
+Initial release of the Game Server Wrapper for Amazon GameLift Servers. Full release notes:
+https://docs.aws.amazon.com/gamelift/latest/developerguide/release-notes.html#release-notes-03112025
