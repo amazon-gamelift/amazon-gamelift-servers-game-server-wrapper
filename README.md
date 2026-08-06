@@ -27,7 +27,7 @@ The game server wrapper enables rapid onboarding to Amazon GameLift Servers, sup
 ### Any Game Server Executable
 A game sever executable is required.
 
-### Go programming language, v1.24+
+### Go programming language, v1.25+
 The game server wrapper is implemented in Go. Follow the Go installation guide for your platform: https://go.dev/doc/install
 
 ### AWS CLI
@@ -56,12 +56,43 @@ cd amazon-gamelift-servers-game-server-wrapper
 make
 ```
 
+#### Build for a specific architecture (x86_64/arm64)
+The wrapper cross-compiles for both `amd64` (x86_64) and `arm64`. On Mac and Linux, `make` builds for your host architecture, and `make build-all` builds every supported `os/arch` combination. To build for a single target architecture, set `GOOS` and `GOARCH`:
+
+```shell
+# Build for x86_64 Linux (artifacts under out/linux/amd64/)
+GOOS=linux GOARCH=amd64 make build
+
+# Build for arm64 Linux (artifacts under out/linux/arm64/)
+GOOS=linux GOARCH=arm64 make build
+
+# Build every supported platform (includes linux/amd64 and linux/arm64)
+make build-all
+```
+
+Artifacts are written to `out/<os>/<arch>/`. Use the path that matches the architecture of the fleet instance type you intend to deploy to — for example `out/linux/amd64` for x86_64 instances (e.g. `c5.large`) and `out/linux/arm64` for arm64 instances (e.g. `c6g.large`). The architecture-specific examples in the sections below use `amd64`; substitute `arm64` when targeting arm64 instances.
+
 ### Windows
 ```shell
 git clone git@github.com:amazon-gamelift/amazon-gamelift-servers-game-server-wrapper.git
 cd amazon-gamelift-servers-game-server-wrapper
 powershell -file .\build.ps1
 ```
+
+By default `build.ps1` builds a Windows x86_64 (`windows/amd64`) wrapper. To cross-compile from Windows for a Linux fleet — including arm64 — pass `-GoOS` and `-GoArch`:
+
+```powershell
+# Build a Linux x86_64 wrapper (artifacts under out\linux\amd64\)
+powershell -file .\build.ps1 -GoOS linux -GoArch amd64
+
+# Build a Linux arm64 wrapper (artifacts under out\linux\arm64\)
+powershell -file .\build.ps1 -GoOS linux -GoArch arm64
+
+# Build a Windows arm64 wrapper (artifacts under out\windows\arm64\)
+powershell -file .\build.ps1 -GoOS windows -GoArch arm64
+```
+
+Tests are only run when building for the host platform (`windows/amd64`); they are skipped when cross-compiling because the resulting test binaries cannot execute on the Windows host.
 
 ### Troubleshooting build issues
 An error similar to `dial tcp: lookup proxy.golang.org: no such host` can be caused by a network or firewall issue when downloading dependencies. Run the following command before attempting to build again:
@@ -304,7 +335,7 @@ aws gamelift upload-build \
     --build-version gamelift-test-2025-03-11-1 \
     --build-root out/linux/amd64/gamelift-servers-managed-ec2 \
     --operating-system AMAZON_LINUX_2023 \
-    --server-sdk-version 5.4.1 \
+    --server-sdk-version 5.6.0 \
     --region us-west-2
 ```
 - For Windows builds, use `--operating-system WINDOWS_2016`
@@ -360,6 +391,7 @@ aws gamelift create-fleet `
 ```
 
 - `build-id` should match the build that was created in the last step.
+- `--ec2-instance-type` must match the architecture of the build you uploaded. For an x86_64 build (`out/linux/amd64`), use an x86_64 instance type such as `c5.large`. For an arm64 build (`out/linux/arm64`), use an arm64 instance type such as `c6g.large`.
 
 After creating the fleet, record the **fleet id** from the API response. We will use it for game session creations.
 
@@ -414,10 +446,22 @@ game-server-details:
 - `game-server-args` defines arguments that will be passed to the game server executable. See [Game Server Arguments](#game-server-arguments) for details.
 
 ### Build Image
-Build the image using `docker build` for the gamelift-servers-managed-containers directory. For example
+Build the image using `docker build` for the gamelift-servers-managed-containers directory. The `--platform` flag selects the base image architecture. Make sure `--platform`, the `out/<os>/<arch>` source directory, and your container fleet instance type all use the same architecture.
+
+For x86_64 (e.g. `c5.large` fleets):
 ```bash
 docker build --platform=linux/amd64 -t gamelift-sdk-wrapper-sample:latest out/linux/amd64/gamelift-servers-managed-containers --progress=plain
 ```
+
+For arm64 (e.g. `c6g.large` fleets):
+```bash
+docker build --platform=linux/arm64 -t gamelift-sdk-wrapper-sample:latest out/linux/arm64/gamelift-servers-managed-containers --progress=plain
+```
+
+NOTE: The architecture you build must match the container fleet instance type chosen in [Create Container Fleet](#create-container-fleet). To build an image for a different architecture than your host (e.g. `arm64` on an `amd64` machine), Docker Desktop supports this out of the box; on Linux Docker Engine you may need to install QEMU emulators (see Docker's [multi-platform build docs](https://docs.docker.com/build/building/multi-platform/)).
+
+NOTE: Amazon GameLift Servers requires a single-architecture image manifest. If `create-container-group-definition` fails with an error like `Failed to parse Container Image ... verify that the OS and Architecture are supported`, your image was likely pushed as a multi-architecture manifest list (the default for some Docker/`buildx` configurations). Build and push a single-platform image with `docker buildx build --platform=linux/arm64 --provenance=false -t <image> <dir> --push`.
+
 ### Push Image to ECR
 In this step we will use AWS CLI to create an [Amazon ECR private repository](https://docs.aws.amazon.com/AmazonECR/latest/userguide/Repositories.html), and push the image we built from the last step to the repository. You must modify `AWS_ACCOUNT_ID` to be your account ID.
 
@@ -448,7 +492,7 @@ aws gamelift create-container-group-definition \
 --operating-system AMAZON_LINUX_2023 \
 --total-memory-limit-mebibytes 1024 \
 --total-vcpu-limit 1 \
---game-server-container-definition "{\"ContainerName\": \"GameServer\", \"ImageUri\": \"${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/gamelift-sdk-wrapper-sample:latest\", \"PortConfiguration\": {\"ContainerPortRanges\": [{\"FromPort\": 37016, \"ToPort\": 37020, \"Protocol\": \"TCP\"}, {\"FromPort\": 37016, \"ToPort\": 37020, \"Protocol\": \"UDP\"}]}, \"ServerSdkVersion\": \"5.4.1\"}"
+--game-server-container-definition "{\"ContainerName\": \"GameServer\", \"ImageUri\": \"${AWS_ACCOUNT_ID}.dkr.ecr.us-west-2.amazonaws.com/gamelift-sdk-wrapper-sample:latest\", \"PortConfiguration\": {\"ContainerPortRanges\": [{\"FromPort\": 37016, \"ToPort\": 37020, \"Protocol\": \"TCP\"}, {\"FromPort\": 37016, \"ToPort\": 37020, \"Protocol\": \"UDP\"}]}, \"ServerSdkVersion\": \"5.6.0\"}"
 ```
 Wait for it to be READY before proceeding. You can check its status using [AWS console](https://console.aws.amazon.com/gamelift/container-groups) or [DescribeContainerGroupDefinition API](https://docs.aws.amazon.com/gamelift/latest/apireference/API_DescribeContainerGroupDefinition.html)
 ### Create Container Fleet Role
@@ -469,6 +513,8 @@ aws gamelift create-container-fleet \
 --fleet-role-arn "arn:aws:iam::${AWS_ACCOUNT_ID}:role/GameLiftContainerFleet" \
 --game-server-container-group-definition-name "gamelift-sdk-wrapper-sample"
 ```
+- `--instance-type` must match the architecture of the image you built and pushed. Use an x86_64 instance type such as `c5.large` for a `linux/amd64` image, or an arm64 instance type such as `c6g.large` for a `linux/arm64` image.
+
 After creating the fleet, record the **fleet id** from the API response. We will use it for game session creations.
 
 Wait for it to be ACTIVE before proceeding. You can check its status using [AWS console](https://console.aws.amazon.com/gamelift/container-fleets) or [DescribeContainerFleet API](https://docs.aws.amazon.com/gamelift/latest/apireference/API_DescribeContainerFleet.html)

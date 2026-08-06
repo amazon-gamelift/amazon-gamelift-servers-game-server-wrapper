@@ -3,20 +3,25 @@
 
 param (
     [string]$Major = "1",
-    [string]$Minor = "2",
-    [string]$Patch = "1",
-    [string]$Out = "out"
+    [string]$Minor = "3",
+    [string]$Patch = "0",
+    [string]$Out = "out",
+    # Target OS/architecture for the build. Defaults to windows/amd64.
+    # Set these to cross-compile from Windows for other targets, e.g.
+    #   powershell -file .\build.ps1 -GoOS linux -GoArch arm64
+    # to build a Linux arm64 wrapper to deploy to a Linux fleet.
+    [string]$GoOS = "windows",
+    [ValidateSet("amd64", "arm64")]
+    [string]$GoArch = "amd64"
 )
 
 $ComputeTypes = @("managed-ec2", "anywhere", "managed-containers")
 $AppName = "amazon-gamelift-servers-game-server-wrapper"
 $AppPackage = "github.com/amazon-gamelift/$AppName"
-$GoOS = "windows"
-$GoArch = "amd64"
-$FileExt = ".exe"
+$FileExt = if ($GoOS -eq "windows") { ".exe" } else { "" }
 $OutFolder = "$Out\$GoOS\$GoArch\"
 $BuildDir = "src"
-$ServerSdkUrl = "https://github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/releases/download/v5.4.1/GameLift-Go-ServerSDK-5.4.1.zip"
+$ServerSdkUrl = "https://github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/releases/download/v5.6.0/GameLift-Go-ServerSDK-5.6.0.zip"
 $ServerSdkFileName = "gamelift-server-sdk.zip"
 $ServerSdkExtractDir = "src/ext/gamelift-servers-server-sdk"
 
@@ -74,10 +79,11 @@ function Build {
 
         Copy-Item "$OutFolder\$AppName\$AppName$FileExt" "$ComputeTypeOutFolder\$AppName$FileExt" -Force
         Copy-Item "src\template\template-$Type-config.yaml" "$ComputeTypeOutFolder\config.yaml" -Force
-    }
 
-    if ($Type -eq "managed-containers") {
-        Copy-Item "src\template\Dockerfile" "$ComputeTypeOutFolder\Dockerfile" -Force
+        # The container Dockerfile is only needed for the managed-containers target.
+        if ($Type -eq "managed-containers") {
+            Copy-Item "src\template\Dockerfile" "$ComputeTypeOutFolder\Dockerfile" -Force
+        }
     }
 
     # Cleanup unnecessary Wrapper folder and ServerSDK file
@@ -87,8 +93,18 @@ function Build {
 
 function Test {
     Build
-    Write-Host "Running tests..."
-    Invoke-Expression "go test -C $BuildDir ./..."
+
+    # Cross-compiled test binaries can't run on the build host, so only run
+    # tests when building for the host platform (windows/amd64).
+    if ($GoOS -eq "windows" -and $GoArch -eq "amd64") {
+        Write-Host "Running tests..."
+        $Env:GOOS = "windows"
+        $Env:GOARCH = "amd64"
+        Invoke-Expression "go test -C $BuildDir ./..."
+    }
+    else {
+        Write-Host "Skipping tests: cross-compiling for $GoOS/$GoArch (cannot run non-host test binaries)."
+    }
 }
 
 # Default action
