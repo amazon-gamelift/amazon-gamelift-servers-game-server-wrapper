@@ -93,22 +93,25 @@ type Handler struct {
 	next   slog.Handler
 }
 
-func (handler *Handler) record(level slog.Level) *log.Record {
-	r := &log.Record{}
-
+// severity maps a slog.Level to the corresponding OpenTelemetry log.Severity.
+func severity(level slog.Level) log.Severity {
 	switch level {
 	case slog.LevelError:
-		r.SetSeverity(log.SeverityError)
+		return log.SeverityError
 	case slog.LevelWarn:
-		r.SetSeverity(log.SeverityWarn)
+		return log.SeverityWarn
 	case slog.LevelInfo:
-		r.SetSeverity(log.SeverityInfo)
+		return log.SeverityInfo
 	case slog.LevelDebug:
-		r.SetSeverity(log.SeverityDebug)
+		return log.SeverityDebug
 	default:
-		r.SetSeverity(log.SeverityInfo)
+		return log.SeverityInfo
 	}
+}
 
+func (handler *Handler) record(level slog.Level) *log.Record {
+	r := &log.Record{}
+	r.SetSeverity(severity(level))
 	return r
 }
 
@@ -120,8 +123,7 @@ func Slogger(logger log.Logger, next slog.Handler) *slog.Logger {
 }
 
 func (handler *Handler) Enabled(ctx context.Context, level slog.Level) bool {
-	r := handler.record(level)
-	otelEnabled := handler.logger.Enabled(ctx, *r)
+	otelEnabled := handler.logger.Enabled(ctx, log.EnabledParameters{Severity: severity(level)})
 	if otelEnabled {
 		return true
 	}
