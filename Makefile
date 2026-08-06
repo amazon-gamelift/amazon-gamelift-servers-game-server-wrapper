@@ -8,11 +8,11 @@ default: test
 COMPUTE_TYPES ?= managed-ec2 anywhere managed-containers
 
 MAJOR ?= 1
-MINOR ?= 2
-PATCH ?= 1
+MINOR ?= 3
+PATCH ?= 0
 APP_NAME ?= amazon-gamelift-servers-game-server-wrapper
 APP_PACKAGE ?= github.com/amazon-gamelift/$(APP_NAME)
-SERVER_SDK_URL=https://github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/releases/download/v5.4.1/GameLift-Go-ServerSDK-5.4.1.zip
+SERVER_SDK_URL=https://github.com/amazon-gamelift/amazon-gamelift-servers-go-server-sdk/releases/download/v5.6.0/GameLift-Go-ServerSDK-5.6.0.zip
 SERVER_SDK_FILE_NAME=gamelift-servers-server-sdk.zip
 SERVER_SDK_EXTRACT_DIR=src/ext/gamelift-servers-server-sdk
 
