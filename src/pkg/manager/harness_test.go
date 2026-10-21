@@ -121,15 +121,14 @@ func Test_Harness_HostingTerminate_HappyPath(t *testing.T) {
 		Reason: "Unit Test",
 	}
 
-	var hostingTerminateEvent *events.HostingTerminate
+	hostingTerminateEventChannel := make(chan *events.HostingTerminate, 1)
 
 	//act
 	go func() {
 		select {
-		case hostingTerminateEvent = <-harnessTestHelper.Harness.hostingTerminate:
-			return
+		case hostingTerminateEvent := <-harnessTestHelper.Harness.hostingTerminate:
+			hostingTerminateEventChannel <- hostingTerminateEvent
 		case <-harnessTestHelper.Ctx.Done():
-
 			return
 		}
 	}()
@@ -139,7 +138,13 @@ func Test_Harness_HostingTerminate_HappyPath(t *testing.T) {
 	//assert
 	assert.Nil(t, err)
 	assert.NotNil(t, harnessTestHelper.Harness.hostingTerminate)
-	assert.Same(t, harnessTestHelper.HostingTerminateEvent, hostingTerminateEvent)
+
+	select {
+	case hostingTerminateEvent := <-hostingTerminateEventChannel:
+		assert.Same(t, harnessTestHelper.HostingTerminateEvent, hostingTerminateEvent)
+	case <-harnessTestHelper.Ctx.Done():
+		t.Fatal("timed out waiting for hosting terminate event")
+	}
 }
 
 func Test_Harness_HealthCheck_HappyPath(t *testing.T) {
