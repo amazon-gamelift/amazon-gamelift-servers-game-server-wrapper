@@ -4,7 +4,7 @@
 param (
     [string]$Major = "1",
     [string]$Minor = "3",
-    [string]$Patch = "0",
+    [string]$Patch = "1",
     [string]$Out = "out",
     # Target OS/architecture for the build. Defaults to windows/amd64.
     # Set these to cross-compile from Windows for other targets, e.g.

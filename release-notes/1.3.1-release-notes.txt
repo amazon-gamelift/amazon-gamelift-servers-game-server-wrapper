@@ -1,0 +1,2 @@
+- Upgraded game server wrapper dependencies to newer versions
+- Raised the minimum Go version required to build the game server wrapper from source to 1.26
