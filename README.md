@@ -27,7 +27,7 @@ The game server wrapper enables rapid onboarding to Amazon GameLift Servers, sup
 ### Any Game Server Executable
 A game sever executable is required.
 
-### Go programming language, v1.25+
+### Go programming language, v1.26+
 The game server wrapper is implemented in Go. Follow the Go installation guide for your platform: https://go.dev/doc/install
 
 ### AWS CLI
